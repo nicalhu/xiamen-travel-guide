@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OKX v3 iOS客户端专项测试报告</title>
+    <!-- TailwindCSS 通过CDN引入 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // 配置Tailwind主题
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style type="text/css">
+        /* 自定义样式 */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 自定义动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        
+        /* 图表样式 */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        /* 卡片悬停效果 */
+        .report-card {
+            transition: all 0.3s ease;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* 按钮悬停效果 */
+        .hover-button {
+            transition: all 0.2s ease;
+        }
+        
+        .hover-button:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 懒加载占位符 */
+        .lazy-placeholder {
+            background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-100 transition-colors duration-300">
+    <!-- 主题切换按钮 -->
+    <button id="theme-toggle" class="fixed top-4 right-4 z-50 p-2 rounded-full bg-white dark:bg-secondary-800 shadow-md hover-button">
+        <i class="fas fa-sun text-yellow-500 dark:hidden"></i>
+        <i class="fas fa-moon text-blue-300 hidden dark:block"></i>
+    </button>
+
+    <!-- 页面容器 -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-6xl">
+        <!-- 页面头部 -->
+        <header class="mb-12 animate-fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-primary-600 text-white p-3 rounded-lg">
+                        <i class="fas fa-mobile-alt text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl sm:text-4xl font-bold text-secondary-900 dark:text-white">OKX v3 iOS客户端</h1>
+                        <p class="text-lg text-secondary-600 dark:text-secondary-400">专项测试报告</p>
+                    </div>
+                </div>
+                <div class="hidden sm:block">
+                    <span class="px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-sm font-medium">
+                        <i class="fas fa-check-circle mr-1"></i> 已完成
+                    </span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="report-card bg-white dark:bg-secondary-800 p-6 rounded-xl shadow-sm">
+                    <div class="flex items-center space-x-2 mb-2 text-primary-600 dark:text-primary-400">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3 class="font-semibold">测试周期</h3>
+                    </div>
+                    <p class="text-secondary-700 dark:text-secondary-300">2023年10月15日 - 2023年10月30日</p>
+                </div>
+                
+                <div class="report-card bg-white dark:bg-secondary-800 p-6 rounded-xl shadow-sm">
+                    <div class="flex items-center space-x-2 mb-2 text-primary-600 dark:text-primary-400">
+                        <i class="fas fa-users"></i>
+                        <h3 class="font-semibold">测试团队</h3>
+                    </div>
+                    <p class="text-secondary-700 dark:text-secondary-300">移动应用测试小组 (5人)</p>
+                </div>
+                
+                <div class="report-card bg-white dark:bg-secondary-800 p-6 rounded-xl shadow-sm">
+                    <div class="flex items-center space-x-2 mb-2 text-primary-600 dark:text-primary-400">
+                        <i class="fas fa-code-branch"></i>
+                        <h3 class="font-semibold">版本信息</h3>
+                    </div>
+                    <p class="text-secondary-700 dark:text-secondary-300">OKX v3.0.5 (Build 2310)</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- 报告摘要 -->
+        <section class="mb-16 animate-fade-in" style="animation-delay: 0.1s;">
+            <div class="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6 mb-6">
+                <h2 class="text-2xl font-bold mb-4 text-secondary-900 dark:text-white">测试摘要</h2>
+                <p class="text-secondary-700 dark:text-secondary-300 mb-4">
+                    本次测试针对OKX v3 iOS客户端进行了全面的功能、性能和用户体验评估。测试覆盖了交易功能、账户管理、市场数据、安全性和应用性能等关键方面。
+                </p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+                    <div class="bg-secondary-50 dark:bg-secondary-700 p-4 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <span class="text-secondary-600 dark:text-secondary-300">测试用例总数</span>
+                            <span class="text-2xl font-bold text-secondary-900 dark:text-white">248</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-secondary-50 dark:bg-secondary-700 p-4 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <span class="text-secondary-600 dark:text-secondary-300">发现缺陷数</span>
+                            <span class="text-2xl font-bold text-red-600 dark:text-red-400">37</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-secondary-50 dark:bg-secondary-700 p-4 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <span class="text-secondary-600 dark:text-secondary-300">已修复缺陷</span>
+                            <span class="text-2xl font-bold text-green-600 dark:text-green-400">32</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-secondary-50 dark:bg-secondary-700 p-4 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <span class="text-secondary-600 dark:text-secondary-300">测试通过率</span>
+                            <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">94.3%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-secondary-900 dark:text-white">缺陷严重程度分布</h3>
+                    <div class="chart-container" id="severity-chart">
+                        <canvas id="severityChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-secondary-900 dark:text-white">缺陷模块分布</h3>
+                    <div class="chart-container" id="module-chart">
+                        <canvas id="moduleChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 测试范围 -->
+        <section class="mb-16 animate-fade-in" style="animation-delay: 0.2s;">
+            <h2 class="text-2xl font-bold mb-6 text-secondary-900 dark:text-white">测试范围</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="report-card bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="bg-blue-100 dark:bg-blue-900 p-2 rounded-lg">
+                            <i class="fas fa-exchange-alt text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-secondary-900 dark:text-white">交易功能</h3>
+                    </div>
+                    <ul class="space-y-2 text-secondary-700 dark:text-secondary-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>现货交易流程</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>合约交易功能</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>杠杆交易设置</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>订单管理与历史</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="report-card bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="bg-purple-100 dark:bg-purple-900 p-2 rounded-lg">
+                            <i class="fas fa-user-shield text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-secondary-900 dark:text-white">账户与安全</h3>
+                    </div>
+                    <ul class="space-y-2 text-secondary-700 dark:text-secondary-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>登录与注册流程</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>二次验证功能</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>资金密码设置</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>安全中心功能</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="report-card bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="bg-green-100 dark:bg-green-900 p-2 rounded-lg">
+                            <i class="fas fa-chart-line text-green-600 dark:text-green-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-secondary-900 dark:text-white">市场与数据</h3>
+                    </div>
+                    <ul class="space-y-2 text-secondary-700 dark:text-secondary-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>行情数据展示</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>K线图表功能</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>市场深度分析</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>自选币种管理</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="report-card bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="bg-orange-100 dark:bg-orange-900 p-2 rounded-lg">
+                            <i class="fas fa-wallet text-orange-600 dark:text-orange-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-secondary-900 dark:text-white">资产管理</h3>
+                    </div>
+                    <ul class="space-y-2 text-secondary-700 dark:text-secondary-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>资产总览功能</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>充值与提现流程</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>资金划转功能</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>财务记录查询</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 测试结果 -->
+        <section class="mb-16 animate-fade-in" style="animation-delay: 0.3s;">
+            <h2 class="text-2xl font-bold mb-6 text-secondary-900 dark:text-white">测试结果</h2>
+            
+            <div class="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6 mb-6">
+                <h3 class="text-xl font-semibold mb-4 text-secondary-900 dark:text-white">主要发现</h3>
+                
+                <div class="space-y-4">
+                    <div class="p-4 bg-red-50 dark:bg-red-900/30 rounded-lg">
+                        <h4 class="font-medium text-red-800 dark:text-red-300 mb-2">高优先级问题</h4>
+                        <ul class="list-disc pl-5 text-secondary-700 dark:text-secondary-300 space-y-1">
+                            <li>在网络不稳定情况下，部分交易订单状态显示异常</li>
+                            <li>大额资金转账时，二次验证偶发性失效</li>
+                            <li>特定条件下K线图加载失败导致应用崩溃</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg">
+                        <h4 class="font-medium text-yellow-800 dark:text-yellow-300 mb-2">中优先级问题</h4>
+                        <ul class="list-disc pl-5 text-secondary-700 dark:text-secondary-300 space-y-1">
+                            <li>市场深度图在频繁切换交易对时出现数据延迟</li>
+                            <li>部分UI元素在iPhone SE等小屏设备上显示不完整</li>
+                            <li>资产页面在大量币种时加载速度明显变慢</li>
+                            <li>合约交易杠杆调整滑块操作不够流畅</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                        <h4 class="font-medium text-blue-800 dark:text-blue-300 mb-2">低优先级问题</h4>
+                        <ul class="list-disc pl-5 text-secondary-700 dark:text-secondary-300 space-y-1">
+                            <li>部分非关键提示文案存在拼写错误</li>
+                            <li>夜间模式下某些图标对比度不足</li>
+                            <li>行情页面下拉刷新动画偶尔卡顿</li>
+                            <li>设置页面部分选项排序不够合理</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="report-card bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6 col-span-1 lg:col-span-2">
+                    <h3 class="text-xl font-semibold mb-4 text-secondary-900 dark:text-white">性能测试结果</h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-secondary-200 dark:divide-secondary-700">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">指标</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">目标值</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">实际值</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">状态</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-secondary-200 dark:divide-secondary-700">
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">应用启动时间</td>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">≤ 2.5秒</td>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">2.1秒</td>
+                                    <td class="px-4 py-3 text-sm">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">通过</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">页面切换响应时间</td>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">≤ 0.5秒</td>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">0.3秒</td>
+                                    <td class="px-4 py-3 text-sm">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">通过</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">K线图加载时间</td>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">≤ 1.5秒</td>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">1.8秒</td>
+                                    <td class="px-4 py-3 text-sm">
+                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full text-xs">需优化</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">内存占用</td>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">≤ 200MB</td>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">185MB</td>
+                                    <td class="px-4 py-3 text-sm">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">通过</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">电池消耗率</td>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">≤ 5%/小时</td>
+                                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">4.2%/小时</td>
+                                    <td class="px-4 py-3 text-sm">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">通过</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="report-card bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-secondary-900 dark:text-white">兼容性测试</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-medium text-secondary-700 dark:text-secondary-300 mb-2">测试设备</h4>
+                            <ul class="list-disc pl-5 text-secondary-600 dark:text-secondary-400 space-y-1">
+                                <li>iPhone 14 Pro (iOS 16.5)</li>
+                                <li>iPhone 13 (iOS 16.4)</li>
+                                <li>iPhone SE 2022 (iOS 16.3)</li>
+                                <li>iPhone 11 (iOS 15.7)</li>
+                                <li>iPhone XR (iOS 15.5)</li>
+                                <li>iPad Pro 12.9" (iOS 16.5)</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-medium text-secondary-700 dark:text-secondary-300 mb-2">测试结果</h4>
+                            <div class="flex items-center space-x-1">
+                                <div class="h-3 w-full bg-green-500 rounded-l-full"></div>
+                                <div class="h-3 w-1/12 bg-yellow-500"></div>
+                                <div class="h-3 w-1/24 bg-red-500 rounded-r-full"></div>
+                            </div>
+                            <div class="flex justify-between mt-1 text-xs text-secondary-600 dark:text-secondary-400">
+                                <span>兼容性良好 (92%)</span>
+                                <span>轻微问题 (6%)</span>
+                                <span>严重问题 (2%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 建议与改进 -->
+        <section class="mb-16 animate-fade-in" style="animation-delay: 0.4s;">
+            <h2 class="text-2xl font-bold mb-6 text-secondary-900 dark:text-white">建议与改进</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="report-card bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="bg-indigo-100 dark:bg-indigo-900 p-2 rounded-lg">
+                            <i class="fas fa-code text-indigo-600 dark:text-indigo-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-secondary-900 dark:text-white">技术优化建议</h3>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-medium text-secondary-800 dark:text-secondary-200 mb-2">性能优化</h4>
+                            <p class="text-secondary-700 dark:text-secondary-300 mb-2">
+                                针对K线图加载时间超出目标值的问题，建议以下优化措施：
+                            </p>
+                            <ul class="list-disc pl-5 text-secondary-600 dark:text-secondary-400 space-y-1">
+                                <li>实现K线数据分段加载机制，优先加载可视区域数据</li>
+                                <li>优化WebSocket连接管理，减少数据传输延迟</li>
+                                <li>考虑使用本地缓存策略，减少重复数据请求</li>
+                                <li>评估替换为性能更优的图表库或优化现有图表渲染逻辑</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-medium text-secondary-800 dark:text-secondary-200 mb-2">稳定性提升</h4>
+                            <ul class="list-disc pl-5 text-secondary-600 dark:text-secondary-400 space-y-1">
+                                <li>增强网络异常处理机制，确保交易状态一致性</li>
+                                <li>完善应用崩溃自动恢复功能，提高用户容错体验</li>
+                                <li>优化内存管理，特别是大量资产数据加载时的内存使用</li>
+                                <li>实现更健壮的异常捕获和日志记录系统</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="report-card bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="bg-pink-100 dark:bg-pink-900 p-2 rounded-lg">
+                            <i class="fas fa-paint-brush text-pink-600 dark:text-pink-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-secondary-900 dark:text-white">用户体验改进</h3>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-medium text-secondary-800 dark:text-secondary-200 mb-2">界面优化</h4>
+                            <ul class="list-disc pl-5 text-secondary-600 dark:text-secondary-400 space-y-1">
+                                <li>重新设计小屏设备上的关键UI元素，确保完整显示</li>
+                                <li>优化夜间模式下的图标对比度，提高可读性</li>
+                                <li>改进合约交易杠杆滑块的触控反馈，提升操作流畅度</li>
+                                <li>重新组织设置页面选项，按照使用频率排序</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-medium text-secondary-800 dark:text-secondary-200 mb-2">功能增强</h4>
+                            <ul class="list-disc pl-5 text-secondary-600 dark:text-secondary-400 space-y-1">
+                                <li>增加交易确认步骤，减少误操作风险</li>
+                                <li>提供更直观的资产变动可视化展示</li>
+                                <li>优化二次验证流程，提高大额转账安全性</li>
+                                <li>增强网络状态提示，在弱网环境下提供更明确的反馈</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6 mt-6">
+                <h3 class="text-xl font-semibold mb-4 text-secondary-900 dark:text-white">后续行动计划</h3>
+                
+                <div class="relative overflow-x-auto">
+                    <table class="min-w-full divide-y divide-secondary-200 dark:divide-secondary-700">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">优先级</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">任务</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">负责团队</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">计划完成时间</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-secondary-200 dark:divide-secondary-700">
+                            <tr>
+                                <td class="px-4 py-3 text-sm">
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-full text-xs">P0</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">修复交易订单状态异常问题</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">交易核心团队</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">2023-11-05</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 text-sm">
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-full text-xs">P0</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">修复二次验证失效问题</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">安全团队</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">2023-11-07</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 text-sm">
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-full text-xs">P0</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">修复K线图崩溃问题</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">行情团队</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">2023-11-08</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 text-sm">
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full text-xs">P1</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">优化K线图加载性能</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">行情团队</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">2023-11-15</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 text-sm">
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full text-xs">P1</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">修复小屏设备UI显示问题</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">UI/UX团队</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">2023-11-20</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 text-sm">
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs">P2</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">修复文案拼写错误</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">内容团队</td>
+                                <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">2023-11-25</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 结论 -->
+        <section class="mb-16 animate-fade-in" style="animation-delay: 0.5s;">
+            <div class="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+                <h2 class="text-2xl font-bold mb-4 text-secondary-900 dark:text-white">结论</h2>
+                
+                <p class="text-secondary-700 dark:text-secondary-300 mb-4">
+                    OKX v3 iOS客户端整体测试结果良好，通过率达到94.3%。应用在交易功能、账户安全、市场数据和资产管理等核心功能上表现稳定，用户体验流畅。
+                </p>
+                
+                <p class="text-secondary-700 dark:text-secondary-300 mb-4">
+                    发现的主要问题集中在网络异常处理、二次验证机制和K线图性能方面，这些问题已纳入优先修复计划。建议在下一版本发布前完成所有P0级别问题的修复，并在后续版本中逐步优化P1和P2级别的问题。
+                </p>
+                
+                <p class="text-secondary-700 dark:text-secondary-300">
+                    总体而言，OKX v3 iOS客户端已达到发布标准，建议在修复关键问题后发布正式版本，并持续监控用户反馈进行迭代优化。
+                </p>
+            </div>
+        </section>
+        
+        <!-- 作者信息 -->
+        <footer class="mt-20 border-t border-secondary-200 dark:border-secondary-700 pt-8 pb-16 animate-fade-in" style="animation-delay: 0.6s;">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="md:col-span-2">
+                    <h3 class="text-xl font-bold mb-4 text-secondary-900 dark:text-white">关于作者</h3>
+                    <p class="text-secondary-700 dark:text-secondary-300 mb-4">
+                        张明是一位资深移动应用测试专家，拥有超过8年的金融科技产品测试经验。专注于加密货币交易应用的功能验证、性能优化和安全测试，致力于提供高质量的用户体验和安全可靠的交易环境。
+                    </p>
+                    <div class="flex items-center space-x-4 mt-6">
+                        <a href="https://twitter.com/zhangming_tech" target="_blank" rel="noopener noreferrer" class="text-secondary-600 hover:text-primary-600 dark:text-secondary-400 dark:hover:text-primary-400 transition-colors">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="https://linkedin.com/in/zhangming-tech" target="_blank" rel="noopener noreferrer" class="text-secondary-600 hover:text-primary-600 dark:text-secondary-400 dark:hover:text-primary-400 transition-colors">
+                            <i class="fab fa-linkedin text-xl"></i>
+                        </a>
+                        <a href="https://github.com/zhangming-tech" target="_blank" rel="noopener noreferrer" class="text-secondary-600 hover:text-primary-600 dark:text-secondary-400 dark:hover:text-primary-400 transition-colors">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-secondary-900 dark:text-white">联系方式</h3>
+                    <ul class="space-y-2 text-secondary-700 dark:text-secondary-300">
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-envelope text-secondary-500 dark:text-secondary-400"></i>
+                            <span>zhangming@example.com</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-phone text-secondary-500 dark:text-secondary-400"></i>
+                            <span>+86 138 **** 5678</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-map-marker-alt text-secondary-500 dark:text-secondary-400"></i>
+                            <span>上海市浦东新区</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-secondary-200 dark:border-secondary-700 text-center text-secondary-600 dark:text-secondary-400 text-sm">
+                <p>© 2023 OKX测试团队. 保留所有权利.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Chart.js 图表库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- 主题切换和图表初始化脚本 -->
+    <script>
+        // 主题切换功能
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        
+        // 检查用户偏好
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        // 切换主题
+        themeToggleBtn.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+                
+                // 重新渲染图表以适应深色模式
+                initCharts();
+            }
+        });
+        
+        // 初始化图表
+        function initCharts() {
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            const textColor = isDarkMode ? '#cbd5e1' : '#475569';
+            const gridColor = isDarkMode ? '#334155' : '#e2e8f0';
+            
+            // 缺陷严重程度分布图表
+            const severityCtx = document.getElementById('severityChart').getContext('2d');
+            const severityChart = new Chart(severityCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['严重', '高', '中', '低'],
+                    datasets: [{
+                        data: [3, 8, 14, 12],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f97316',
+                            '#eab308',
+                            '#3b82f6'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: textColor,
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                            titleColor: isDarkMode ? '#e2e8f0' : '#1e293b',
+                            bodyColor: isDarkMode ? '#cbd5e1' : '#475569',
+                            borderColor: isDarkMode ? '#334155' : '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%',
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+            
+            // 缺陷模块分布图表
+            const moduleCtx = document.getElementById('moduleChart').getContext('2d');
+            const moduleChart = new Chart(moduleCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['交易功能', '账户安全', '市场数据', '资产管理', '其他'],
+                    datasets: [{
+                        label: '缺陷数量',
+                        data: [12, 8, 10, 5, 2],
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#8b5cf6',
+                            '#ec4899',
+                            '#10b981',
+                            '#6b7280'
+                        ],
+                        borderWidth: 0,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                            titleColor: isDarkMode ? '#e2e8f0' : '#1e293b',
+                            bodyColor: isDarkMode ? '#cbd5e1' : '#475569',
+                            borderColor: isDarkMode ? '#334155' : '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: textColor
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: gridColor
+                            },
+                            ticks: {
+                                color: textColor,
+                                precision: 0
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000
+                    }
+                }
+            });
+        }
+        
+        // 页面加载完成后初始化图表
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            
+            // 添加滚动动画
+            const animatedElements = document.querySelectorAll('.animate-fade-in');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

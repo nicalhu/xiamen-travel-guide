@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OKX SDK Test Report</title>
+    <style>
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #00ccff;
+            --accent-color: #7700ff;
+            --bg-color: #0a0e17;
+            --text-color: #e6e6e6;
+            --border-color: rgba(0, 204, 255, 0.3);
+            --card-bg: rgba(10, 20, 40, 0.7);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(119, 0, 255, 0.05) 0%, transparent 35%);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            padding: 40px 0;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin: 0;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        h2::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .report-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .info-card h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background-color: rgba(0, 102, 255, 0.2);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: rgba(0, 102, 255, 0.1);
+        }
+        
+        .chart-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .chart {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            height: 300px;
+        }
+        
+        .chart h3 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        section {
+            margin-bottom: 40px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), transparent);
+        }
+        
+        a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--secondary-color);
+            transition: color 0.3s;
+        }
+        
+        a:hover {
+            color: var(--primary-color);
+        }
+        
+        .highlight {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        .status-good {
+            color: #00cc99;
+        }
+        
+        .status-warning {
+            color: #ffcc00;
+        }
+        
+        .status-critical {
+            color: #ff3366;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: rgba(230, 230, 230, 0.7);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .pulse-effect {
+            animation: pulse 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OKX SDK 测试报告</h1>
+            <p>SDK合并版本IOS客户端功能测试详情</p>
+        </header>
+        
+        <section>
+            <h2>报告概览</h2>
+            <div class="report-info">
+                <div class="info-card">
+                    <h4>报告信息</h4>
+                    <p><strong>撰写者:</strong> Nicalhu(胡柏明)</p>
+                    <p><strong>撰写时间:</strong> 2025/4/7</p>
+                    <p><strong>测试平台:</strong> IOS</p>
+                    <p><strong>测试时间:</strong> 2025/3/31-2025/4/7</p>
+                </div>
+                <div class="info-card">
+                    <h4>测试版本</h4>
+                    <p><strong>包体:</strong> 线网包6.113版本</p>
+                    <p><strong>版本:</strong> SDK合并版本</p>
+                </div>
+                <div class="info-card">
+                    <h4>测试结果摘要</h4>
+                    <p><strong>风险评估:</strong> <span class="status-good">低风险</span></p>
+                    <p><strong>发现问题:</strong> 3个</p>
+                    <p><strong>严重问题:</strong> 1个</p>
+                    <p><strong>一般问题:</strong> 2个</p>
+                </div>
+            </div>
+        </section>
+        
+        <section>
+            <h2>1. 引言</h2>
+            <h3>1.1 测试目标</h3>
+            <p>本次测试主要为了评估【OKX】SDK合并版本IOS端sdk新增模块与V3版本旧版模块的功能表现，确保该版本在实际运行过程中能够稳定、高效地运作，不会出现严重的功能性问题。为了确保这些关键模块能够在实际应用环境中表现出色，我们不仅依据既定的测试计划进行了功能验证，还模拟了多种用户场景和操作习惯，以检验其功能的稳定性和可靠性。</p>
+            <p>基于此目标，本轮测试中主要测试了两方面的内容：SDK合并版本新需求用例&V3版本测试用例。</p>
+            
+            <h3>1.2 测试内容</h3>
+            <p>本次SDK合并版本功能测试用例基于当前版本需求内容进行设计，主要场景包括应用启动事件、白名单事件、未初始化状态事件、成功状态事件、非配置状态事件、V3版本测试场景，重点验证时序问题以及接口返回是否正确。</p>
+            <p><strong>用例链接:</strong> <a href="https://qcnvn36p2pz9.feishu.cn/sheets/N0TtshN7fhcS4ltqUeBc85van5f?sheet=BBOXrl" target="_blank">测试用例文档</a></p>
+        </section>
+        
+        <section>
+            <h2>2. 测试总结</h2>
+            <h3>2.1 测试结果</h3>
+            <p><strong>整体结论:</strong> 本次测试整体版本功能方面的风险评估为<span class="status-good">低风险</span>。</p>
+            <p><strong>测试详情:</strong> 当前版本功能测试共发现问题3个，其中严重问题1个，一般问题2个；遗留缺陷3个，研发侧评估暂不影响当前迭代发布，后续版本迭代优化。</p>
+            
+            <h3>2.2 遗留问题</h3>
+            <ol>
+                <li>iPhone x（Dopamine越狱）机型启动测试app crash（历史已知问题，持续跟踪）。</li>
+                <li>代理触发检测数据采集失败（历史已知问题，持续跟踪）。</li>
+                <li>启用"okrisk_fp_v3_merge"功能情况，进行网络代理配置导致网络超时，没有获取到/priapi/v3/tlog/log端口数据（需求如此，无需解决）</li>
+            </ol>
+            
+            <h3>2.3 问题列表</h3>
+            <p><strong>Bug详情:</strong> <a href="https://qcnvn36p2pz9.feishu.cn/sheets/N0TtshN7fhcS4ltqUeBc85van5f?sheet=7PF667" target="_blank">Bug链接</a></p>
+            
+            <div class="chart-container">
+                <div class="chart" id="severity-chart">
+                    <h3>2.4 问题按严重程度分布</h3>
+                    <canvas id="severityChart"></canvas>
+                </div>
+                <div class="chart" id="module-chart">
+                    <h3>2.5 问题按模块分布</h3>
+                    <canvas id="moduleChart"></canvas>
+                </div>
+            </div>
+        </section>
+        
+        <section>
+            <h2>3. 测试详情</h2>
+            <h3>3.1 测试用例</h3>
+            <p><strong>设计思路:</strong> 根据需求用例设计，我们可以将其细分为网络端口测试用例，埋点用例、功能用例三大类，以便更全面地覆盖软件的测试需求，确保软件在功能和数据收集方面都能达到预期的标准。</p>
+            
+            <h4>用例按模块划分:</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>模块</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>网络端口相关检测</td>
+                        <td>SDK合并版本需要通过抓包获取的端口数据请求的测试用例</td>
+                    </tr>
+                    <tr>
+                        <td>越狱相关检测</td>
+                        <td>越狱相关检测，越狱设备app启动crash，无法安装</td>
+                    </tr>
+                    <tr>
+                        <td>行为相关检测</td>
+                        <td>代理检测，usb行为检测，模拟点击控件检测</td>
+                    </tr>
+                    <tr>
+                        <td>功能相关检测</td>
+                        <td>截屏&录屏检测等</td>
+                    </tr>
+                    <tr>
+                        <td>埋点相关检测</td>
+                        <td>启动后即可获取数据返回</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p><strong>用例详情:</strong> <a href="https://qcnvn36p2pz9.feishu.cn/sheets/N0TtshN7fhcS4ltqUeBc85van5f?sheet=BBOXrl" target="_blank">测试用例文档</a></p>
+            
+            <h3>3.2 测试机型</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>NO.</th>
+                        <th>device_id</th>
+                        <th>机型名称</th>
+                        <th>机型类型</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>E5ED78E4-2604-4939-BE55-FEE501D4C83F</td>
+                        <td>iphone 14 pro</td>
+                        <td>非越狱机型</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>F3B3C97D-A1E0-40F7-95BE-589625E87A66</td>
+                        <td>Iphone X</td>
+                        <td>越狱机型</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>963B20AC-7AE1-45E4-AD95-B8FFFF18439B</td>
+                        <td>Iphone 11pro</td>
+                        <td>非越狱机型</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>3.3 测试策略</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>测试阶段</th>
+                        <th>测试策略</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>第一轮功能测试</td>
+                        <td>新需求用例执行&V3版本测试用例回归</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section>
+            <h2>4. 测试过程数据</h2>
+            <h3>4.1 测试用例执行情况</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>功能模块</th>
+                        <th>用例数（条）</th>
+                        <th>用例进度</th>
+                        <th>缺陷总计（个）</th>
+                        <th>致命（个）</th>
+                        <th>严重（个）</th>
+                        <th>一般（个）</th>
+                        <th>提示/建议（个）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>网络端口相关检测</td>
+                        <td>15</td>
+                        <td>100%</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>越狱相关检测</td>
+                        <td>2</td>
+                        <td>100%</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>埋点相关检测</td>
+                        <td>11</td>
+                        <td>100%</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>行为相关检测</td>
+                        <td>2</td>
+                        <td>100%</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>功能相关检测</td>
+                        <td>2</td>
+                        <td>100%</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td><strong>总共</strong></td>
+                        <td><strong>32</strong></td>
+                        <td><strong>100%</strong></td>
+                        <td><strong>3</strong></td>
+                        <td><strong>0</strong></td>
+                        <td><strong>1</strong></td>
+                        <td><strong>2</strong></td>
+                        <td><strong>0</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>4.2 版本测试轮次和缺陷分布</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>测试轮次</th>
+                        <th>用例数（条）</th>
+                        <th>发现缺陷数（个）</th>
+                        <th>修复缺陷数（个）</th>
+                        <th>挂起缺陷数（个）</th>
+                        <th>拒绝缺陷数（个）</th>
+                        <th>遗留缺陷数（个）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>第一轮测试</td>
+                        <td>32</td>
+                        <td>3</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>总共</strong></td>
+                        <td><strong>32</strong></td>
+                        <td><strong>3</strong></td>
+                        <td><strong>0</strong></td>
+                        <td><strong>0</strong></td>
+                        <td><strong>0</strong></td>
+                        <td><strong>3</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section>
+            <h2>5. 测试概要</h2>
+            <h3>5.1 测试信息</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>测试项目</th>
+                        <th>测试内容详情</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>测试环境</td>
+                        <td>
+                            <p>测试环境链接：<a href="http://threat-detection-server.dev-security-okex.svc.dev.local:8080/api/v1/tlog/search-tag" target="_blank">http://threat-detection-server.dev-security-okex.svc.dev.local:8080/api/v1/tlog/search-tag</a></p>
+                            <p>埋点链接：<a href="http://threat-detection-server.dev-security-okex.svc.dev.local:8080/api/v1/tlog/search-data" target="_blank">http://threat-detection-server.dev-security-okex.svc.dev.local:8080/api/v1/tlog/search-data</a></p>
+                            <p>预发环境：<a href="https://tlog.okg.com/api/v1/tlog/search-data" target="_blank">https://tlog.okg.com/api/v1/tlog/search-data</a></p>
+                            <p>预发埋点：<a href="https://tlog.okg.com/api/v1/tlog/search-tag" target="_blank">https://tlog.okg.com/api/v1/tlog/search-tag</a></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>测试包</td>
+                        <td>线网包6.113版本</td>
+                    </tr>
+                    <tr>
+                        <td>测试版本</td>
+                        <td>SDK合并版本</td>
+                    </tr>
+                    <tr>
+                        <td>测试人员</td>
+                        <td>欧阳湘勇、yorickye(叶夏立)、nicalhu(胡柏明)</td>
+                    </tr>
+                    <tr>
+                        <td>测试时间</td>
+                        <td>第一轮功能测试：2025.3.31—2025.4.7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;测试策略：新需求用例执行&V3版本测试用例回归</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>5.2 版本主要特性</h3>
+            <ul>
+                <li>【okx】SDK合并版本网络端口检测</li>
+                <li>【okx】SDK合并版本埋点检测</li>
+                <li>【okx】SDK合并版本功能检测</li>
+            </ul>
+        </section>
+        
+        <section>
+            <h2>6. 关于 WeTest</h2>
+            <p>WeTest是腾讯官方出品的一站式质量云，致力于产品质量标准建设和产品品质提升，依托10余年腾讯产品品质管理经验，历经千款腾讯产品磨砺。平台集成云手机、兼容测试、功能测试、性能测试、安全测试、自动化测试等优秀产品服务，满足众多开发者从研发到运营各阶段的测试需求，360度保障产品质量。</p>
+            <p>全球站：<a href="https://www.wetest.net" target="_blank">https://www.wetest.net</a></p>
+            <p>邮箱：<a href="mailto:WeTest@wetest.net">WeTest@wetest.net</a></p>
+        </section>
+        
+        <footer>
+            <p>© 2025 OKX. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 加载页面后初始化图表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 严重程度分布图表
+            const severityCtx = document.getElementById('severityChart').getContext('2d');
+            const severityChart = new Chart(severityCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['严重问题', '一般问题'],
+                    datasets: [{
+                        data: [1, 2],
+                        backgroundColor: [
+                            '#ff3366',
+                            '#ffcc00'
+                        ],
+                        borderColor: 'rgba(10, 14, 23, 0.5)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#e6e6e6'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 模块分布图表
+            const moduleCtx = document.getElementById('moduleChart').getContext('2d');
+            const moduleChart = new Chart(moduleCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['网络端口相关检测', '越狱相关检测', '行为相关检测', '埋点相关检测', '功能相关检测'],
+                    datasets: [{
+                        label: '发现问题数',
+                        data: [1, 1, 1, 0, 0],
+                        backgroundColor: 'rgba(0, 204, 255, 0.5)',
+                        borderColor: 'rgba(0, 102, 255, 0.8)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#e6e6e6'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#e6e6e6'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e6e6e6'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

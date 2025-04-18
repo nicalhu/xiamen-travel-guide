@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四年级立体图形互动小游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #f6c23e;
+            --success-color: #1cc88a;
+            --error-color: #e74a3b;
+            --bg-light: #f8f9fc;
+            --text-dark: #5a5c69;
+            --shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4e73df, #224abe);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .game-area {
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .mode-switch {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            padding: 8px 15px;
+            border: 2px solid var(--primary-color);
+            background-color: white;
+            color: var(--primary-color);
+            margin: 0 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mode-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .shape-display {
+            margin: 20px auto;
+            position: relative;
+            width: 300px;
+            height: 300px;
+            perspective: 800px;
+        }
+        
+        .shape {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+        }
+        
+        .shape-info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #eaecf4;
+            border-radius: 10px;
+        }
+        
+        .shape-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .shape-description {
+            font-size: 16px;
+            line-height: 1.6;
+            text-align: left;
+        }
+        
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            outline: none;
+        }
+        
+        button:hover {
+            background-color: #224abe;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+        }
+        
+        .score-display {
+            font-size: 18px;
+            margin-top: 15px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        
+        .quiz-container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #eaecf4;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .quiz-question {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .quiz-option {
+            padding: 10px;
+            background-color: white;
+            border: 2px solid #d1d3e2;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+        
+        .quiz-option:hover {
+            background-color: #f8f9fc;
+            border-color: var(--primary-color);
+        }
+        
+        .quiz-option.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        
+        .feedback.correct {
+            color: var(--success-color);
+        }
+        
+        .feedback.incorrect {
+            color: var(--error-color);
+        }
+        
+        .student-selector {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #d1d3e2;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .student-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .student-item {
+            padding: 5px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .student-item:hover {
+            background-color: #224abe;
+        }
+        
+        .student-item.selected {
+            background-color: var(--secondary-color);
+            animation: pulse 1s infinite;
+        }
+        
+        .progress {
+            height: 6px;
+            background-color: #eaecf4;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .stars-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            gap: 5px;
+        }
+        
+        .star {
+            font-size: 24px;
+            color: #d1d3e2;
+        }
+        
+        .star.earned {
+            color: var(--secondary-color);
+            animation: pulse 0.5s;
+        }
+        
+        .hint-container {
+            margin-top: 15px;
+            min-height: 50px;
+            color: var(--secondary-color);
+            font-size: 16px;
+        }
+        
+        /* 立方体样式 */
+        .cube-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+        
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-15deg) rotateY(15deg);
+            transition: transform 0.5s;
+            animation: rotate 20s infinite linear;
+        }
+        
+        .cube-face {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            opacity: 0.8;
+        }
+        
+        .cube-front { 
+            transform: translateZ(100px); 
+            background-color: rgba(255, 0, 0, 0.5);
+        }
+        .cube-back { 
+            transform: rotateY(180deg) translateZ(100px); 
+            background-color: rgba(0, 255, 0, 0.5);
+        }
+        .cube-right { 
+            transform: rotateY(90deg) translateZ(100px); 
+            background-color: rgba(0, 0, 255, 0.5);
+        }
+        .cube-left { 
+            transform: rotateY(-90deg) translateZ(100px); 
+            background-color: rgba(255, 255, 0, 0.5);
+        }
+        .cube-top { 
+            transform: rotateX(90deg) translateZ(100px); 
+            background-color: rgba(255, 0, 255, 0.5);
+        }
+        .cube-bottom { 
+            transform: rotateX(-90deg) translateZ(100px); 
+            background-color: rgba(0, 255, 255, 0.5);
+        }
+        
+        /* 四棱锥样式 */
+        .pyramid-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+        
+        .pyramid {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-15deg) rotateY(15deg);
+            transition: transform 0.5s;
+            animation: rotate 20s infinite linear;
+        }
+        
+        .pyramid-face {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 173.2px solid rgba(255, 0, 0, 0.5);
+            transform-origin: 50% 100%;
+        }
+        
+        .pyramid-face:nth-child(1) {
+            transform: rotateY(0deg) translateY(-86.6px) rotateX(30deg);
+        }
+        
+        .pyramid-face:nth-child(2) {
+            transform: rotateY(90deg) translateY(-86.6px) rotateX(30deg);
+        }
+        
+        .pyramid-face:nth-child(3) {
+            transform: rotateY(180deg) translateY(-86.6px) rotateX(30deg);
+        }
+        
+        .pyramid-face:nth-child(4) {
+            transform: rotateY(270deg) translateY(-86.6px) rotateX(30deg);
+        }
+        
+        .pyramid-base {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background-color: rgba(0, 0, 255, 0.5);
+            transform: rotateX(90deg) translateZ(-100px);
+        }
+        
+        /* 圆柱体样式 */
+        .cylinder-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+        
+        .cylinder {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-15deg) rotateY(15deg);
+            transition: transform 0.5s;
+            animation: rotate 20s infinite linear;
+        }
+        
+        .cylinder-side {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 255, 0, 0.5);
+            border-radius: 50%;
+            transform: rotateY(0deg) translateZ(0);
+        }
+        
+        .cylinder-top {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 0, 0, 0.5);
+            border-radius: 50%;
+            transform: rotateX(90deg) translateZ(50px);
+        }
+        
+        .cylinder-bottom {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 0, 255, 0.5);
+            border-radius: 50%;
+            transform: rotateX(-90deg) translateZ(50px);
+        }
+        
+        /* 球体样式 */
+        .sphere-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+        
+        .sphere {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 20s infinite linear;
+        }
+        
+        .sphere-surface {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle at center, rgba(255, 0, 0, 0.7), rgba(0, 0, 255, 0.7));
+            border-radius: 50%;
+            transform-origin: center;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* 三棱柱样式 */
+        .prism-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+        
+        .prism {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-15deg) rotateY(15deg);
+            transition: transform 0.5s;
+            animation: rotate 20s infinite linear;
+        }
+        
+        .prism-face {
+            position: absolute;
+            width: 173.2px;
+            height: 200px;
+            background-color: rgba(255, 0, 0, 0.5);
+            transform-origin: center;
+        }
+        
+        .prism-face:nth-child(1) {
+            transform: rotateY(0deg) translateZ(50px);
+        }
+        
+        .prism-face:nth-child(2) {
+            transform: rotateY(120deg) translateZ(50px);
+        }
+        
+        .prism-face:nth-child(3) {
+            transform: rotateY(240deg) translateZ(50px);
+        }
+        
+        .prism-top {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 173.2px solid rgba(0, 255, 0, 0.5);
+            transform: rotateX(90deg) translateZ(100px);
+        }
+        
+        .prism-bottom {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 173.2px solid rgba(0, 0, 255, 0.5);
+            transform: rotateX(-90deg) translateZ(100px) rotateZ(180deg);
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotateX(-15deg) rotateY(0deg); }
+            100% { transform: rotateX(-15deg) rotateY(360deg); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 640px) {
+            .shape-display {
+                width: 200px;
+                height: 200px;
+            }
+            
+            button {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>立体图形互动小游戏</h1>
+            <p>四年级数学课堂</p>
+            <div class="timer" id="timer">60</div>
+        </div>
+        
+        <div class="game-area">
+            <div class="mode-switch">
+            <button class="mode-btn active" data-mode="explore">探索模式</button>
+            <button class="mode-btn" data-mode="quiz">测试模式</button>
+            <button class="mode-btn" data-mode="match">配对模式</button>
+            <button class="mode-btn" data-mode="grid">平面图形</button>
+        </div>
+            
+            
+            <div class="shape-display" id="shape-display">
+                <!-- 立体图形将在这里显示 -->
+            </div>
+            
+            <div class="shape-info" id="shape-info">
+                <div class="shape-name" id="shape-name">立方体</div>
+                <div class="shape-description" id="shape-description">
+                    立方体有6个面，12条边，8个顶点。每个面都是正方形，所有的面都相等。
+                </div>
+            </div>
+            
+            <div class="quiz-container" id="quiz-container">
+                <div class="quiz-question" id="quiz-question">立方体有多少个面？</div>
+                <div class="quiz-options" id="quiz-options">
+                    <div class="quiz-option" data-answer="4">4个面</div>
+                    <div class="quiz-option" data-answer="6">6个面</div>
+                    <div class="quiz-option" data-answer="8">8个面</div>
+                    <div class="quiz-option" data-answer="12">12个面</div>
+                </div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+            
+            <div class="stars-container" id="stars-container">
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+            </div>
+            
+            <div class="hint-container" id="hint-container"></div>
+            
+            <div class="controls">
+                <button id="prev-btn">上一个</button>
+                <button id="next-btn">下一个</button>
+                <button id="rotate-btn">旋转</button>
+                <button id="check-btn" style="display: none;">检查答案</button>
+            </div>
+            
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <div class="score-display" id="score-display">得分: 0</div>
+            
+            <div class="student-selector">
+                <h3>抽选学生回答</h3>
+                <div class="student-list" id="student-list">
+                    <!-- 学生名单将通过JavaScript动态生成 -->
+                </div>
+                <button id="pick-student-btn" style="margin-top: 15px;">随机抽选</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 立体图形数据
+        const shapes = [
+            {
+                name: "立方体",
+                faces: 6,
+                edges: 12,
+                vertices: 8,
+                description: "立方体有6个面，12条边，8个顶点。每个面都是正方形，所有的面都相等。在我们的生活中，骰子、魔方都是立方体的例子。",
+                render: function(container) {
+                    container.innerHTML = `
+                        <div class="cube-container">
+                            <div class="cube">
+                                <div class="cube-face cube-front">正面</div>
+                                <div class="cube-face cube-back">背面</div>
+                                <div class="cube-face cube-right">右面</div>
+                                <div class="cube-face cube-left">左面</div>
+                                <div class="cube-face cube-top">顶面</div>
+                                <div class="cube-face cube-bottom">底面</div>
+                            </div>
+                        </div>
+                    `;
+                },
+                questions: [
+                    {
+                        question: "立方体有多少个面？",
+                        options: ["4个面", "6个面", "8个面", "12个面"],
+                        answer: "6个面"
+                    },
+                    {
+                        question: "立方体有多少条边？",
+                        options: ["6条边", "8条边", "12条边", "24条边"],
+                        answer: "12条边"
+                    },
+                    {
+                        question: "立方体有多少个顶点？",
+                        options: ["4个顶点", "6个顶点", "8个顶点", "12个顶点"],
+                        answer: "8个顶点"
+                    },
+                    {
+                        question: "下列哪个物品的形状最接近立方体？",
+                        options: ["篮球", "魔方", "铅笔", "圆锥冰淇淋"],
+                        answer: "魔方"
+                    }
+                ]
+            },
+            {
+                name: "四棱锥",
+                faces: 5,
+                edges: 8,
+                vertices: 5,
+                description: "四棱锥有5个面，8条边，5个顶点。它有一个正方形底面和4个三角形侧面。埃及的金字塔就是四棱锥的例子。",
+                render: function(container) {
+                    container.innerHTML = `
+                        <div class="pyramid-container">
+                            <div class="pyramid">
+                                <div class="pyramid-face"></div>
+                                <div class="pyramid-face"></div>
+                                <div class="pyramid-face"></div>
+                                <div class="pyramid-face"></div>
+                                <div class="pyramid-base"></div>
+                            </div>
+                        </div>
+                    `;
+                },
+                questions: [
+                    {
+                        question: "四棱锥有多少个面？",
+                        options: ["4个面", "5个面", "6个面", "8个面"],
+                        answer: "5个面"
+                    },
+                    {
+                        question: "四棱锥的底面是什么形状？",
+                        options: ["三角形", "正方形", "圆形", "五边形"],
+                        answer: "正方形"
+                    },
+                    {
+                        question: "四棱锥有多少个顶点？",
+                        options: ["4个顶点", "5个顶点", "6个顶点", "8个顶点"],
+                        answer: "5个顶点"
+                    },
+                    {
+                        question: "下列哪个建筑的形状最接近四棱锥？",
+                        options: ["埃及金字塔", "圆形体育场", "长方形教学楼", "立方体办公楼"],
+                        answer: "埃及金字塔"
+                    }
+                ]
+            },
+            {
+                name: "圆柱体",
+                faces: 3,
+                edges: 2,
+                vertices: 0,
+                description: "圆柱体有3个面（2个圆形底面和1个弯曲的侧面），2条边（底面的圆周），没有顶点。易拉罐、铅笔筒都是圆柱体的例子。",
+                render: function(container) {
+                    container.innerHTML = `
+                        <div class="cylinder-container">
+                            <div class="cylinder">
+                                <div class="cylinder-side"></div>
+                                <div class="cylinder-top"></div>
+                                <div class="cylinder-bottom"></div>
+                            </div>
+                        </div>
+                    `;
+                },
+                questions: [
+                    {
+                        question: "圆柱体有多少个面？",
+                        options: ["1个面", "2个面", "3个面", "4个面"],
+                        answer: "3个面"
+                    },
+                    {
+                        question: "圆柱体的底面是什么形状？",
+                        options: ["三角形", "正方形", "圆形", "椭圆形"],
+                        answer: "圆形"
+                    },
+                    {
+                        question: "圆柱体有多少个顶点？",
+                        options: ["0个顶点", "2个顶点", "3个顶点", "无数个顶点"],
+                        answer: "0个顶点"
+                    },
+                    {
+                        question: "下列哪个物品的形状最接近圆柱体？",
+                        options: ["足球", "魔方", "易拉罐", "三角尺"],
+                        answer: "易拉罐"
+                    }
+                ]
+            },
+            {
+                name: "球体",
+                faces: 1,
+                edges: 0,
+                vertices: 0,
+                description: "球体只有1个面（弯曲的表面），没有边，没有顶点。足球、地球仪、弹珠都是球体的例子。",
+                render: function(container) {
+                    container.innerHTML = `
+                        <div class="sphere-container">
+                            <div class="sphere">
+                                <div class="sphere-surface"></div>
+                            </div>
+                        </div>
+                    `;
+                },
+                questions: [
+                    {
+                        question: "球体有多少个面？",
+                        options: ["0个面", "1个面", "2个面", "无数个面"],
+                        answer: "1个面"
+                    },
+                    {
+                        question: "球体有多少条边？",
+                        options: ["0条边", "1条边", "无数条边", "球体没有边"],
+                        answer: "0条边"
+                    },
+                    {
+                        question: "球体有多少个顶点？",
+                        options: ["1个顶点", "2个顶点", "无数个顶点", "0个顶点"],
+                        answer: "0个顶点"
+                    },
+                    {
+                        question: "下列哪个物品的形状最接近球体？",
+                        options: ["篮球", "魔方", "铅笔", "圆锥冰淇淋"],
+                        answer: "篮球"
+                    }
+                ]
+            },
+            {
+                name: "三棱柱",
+                faces: 5,
+                edges: 9,
+                vertices: 6,
+                description: "三棱柱有5个面（2个三角形底面和3个矩形侧面），9条边，6个顶点。三角形的巧克力条就是三棱柱的例子。",
+                render: function(container) {
+                    container.innerHTML = `
+                        <div class="prism-container">
+                            <div class="prism">
+                                <div class="prism-face"></div>
+                                <div class="prism-face"></div>
+                                <div class="prism-face"></div>
+                                <div class="prism-top"></div>
+                                <div class="prism-bottom"></div>
+                            </div>
+                        </div>
+                    `;
+                },
+                questions: [
+                    {
+                        question: "三棱柱有多少个面？",
+                        options: ["3个面", "5个面", "6个面", "9个面"],
+                        answer: "5个面"
+                    },
+                    {
+                        question: "三棱柱的底面是什么形状？",
+                        options: ["三角形", "正方形", "圆形", "五边形"],
+                        answer: "三角形"
+                    },
+                    {
+                        question: "三棱柱有多少个顶点？",
+                        options: ["3个顶点", "5个顶点", "6个顶点", "9个顶点"],
+                        answer: "6个顶点"
+                    },
+                    {
+                        question: "下列哪个物品的形状最接近三棱柱？",
+                        options: ["足球", "魔方", "三角形巧克力条", "圆形饼干"],
+                        answer: "三角形巧克力条"
+                    }
+                ]
+            }
+        ];
+        
+        // 学生名单
+        const students = [
+            "张明", "李华", "王芳", "赵强", "刘洋", 
+            "陈静", "杨光", "周婷", "吴杰", "郑丽",
+            "黄伟", "孙艳", "朱磊", "胡晓", "林峰",
+            "徐梅", "高鹏", "马丽", "谢军", "曹颖"
+        ];
+    
+        // 游戏状态
+        const gameState = {
+            currentShapeIndex: 0,
+            score: 0,
+            mode: 'explore',
+            timer: 60,
+            timerInterval: null,
+            learnedShapes: new Set(),
+            currentStreak: 0,
+            stars: 0,
+            selectedAnswer: null,
+            isRotating: false
+        };
+        
+        // DOM元素
+        const elements = {
+            shapeDisplay: document.getElementById('shape-display'),
+            shapeName: document.getElementById('shape-name'),
+            shapeDescription: document.getElementById('shape-description'),
+            quizContainer: document.getElementById('quiz-container'),
+            quizQuestion: document.getElementById('quiz-question'),
+            quizOptions: document.getElementById('quiz-options'),
+            feedback: document.getElementById('feedback'),
+            scoreDisplay: document.getElementById('score-display'),
+            progressBar: document.getElementById('progress-bar'),
+            timer: document.getElementById('timer'),
+            hintContainer: document.getElementById('hint-container'),
+            starsContainer: document.getElementById('stars-container'),
+            studentList: document.getElementById('student-list')
+        };
+        
+                // 初始化游戏
+                function initGame() {
+            // 渲染第一个形状
+            renderCurrentShape();
+            
+            // 更新进度条
+            updateProgressBar();
+            
+            // 生成学生列表
+            generateStudentList();
+            
+            // 添加事件监听器
+            addEventListeners();
+        }
+        
+        // 渲染当前形状
+        function renderCurrentShape() {
+            const currentShape = shapes[gameState.currentShapeIndex];
+            
+            // 更新形状信息
+            elements.shapeName.textContent = currentShape.name;
+            elements.shapeDescription.textContent = currentShape.description;
+            
+            // 渲染3D形状
+            currentShape.render(elements.shapeDisplay);
+            
+            // 如果是测试模式，显示问题
+            if (gameState.mode === 'quiz') {
+                showQuiz();
+            } else {
+                elements.quizContainer.style.display = 'none';
+                document.getElementById('check-btn').style.display = 'none';
+            }
+        }
+        
+        // 显示测验问题
+        function showQuiz() {
+            const currentShape = shapes[gameState.currentShapeIndex];
+            const randomQuestion = currentShape.questions[Math.floor(Math.random() * currentShape.questions.length)];
+            
+            elements.quizQuestion.textContent = randomQuestion.question;
+            
+            // 清空选项
+            elements.quizOptions.innerHTML = '';
+            
+            // 添加选项
+            randomQuestion.options.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'quiz-option';
+                optionElement.textContent = option;
+                optionElement.dataset.answer = option;
+                optionElement.addEventListener('click', selectOption);
+                elements.quizOptions.appendChild(optionElement);
+            });
+            
+            // 清空反馈
+            elements.feedback.textContent = '';
+            elements.feedback.className = 'feedback';
+            
+            // 显示测验容器和检查按钮
+            elements.quizContainer.style.display = 'block';
+            document.getElementById('check-btn').style.display = 'block';
+            
+            // 重置选中的答案
+            gameState.selectedAnswer = null;
+        }
+        
+        // 更新进度条
+        function updateProgressBar() {
+            const progress = (gameState.learnedShapes.size / shapes.length) * 100;
+            elements.progressBar.style.width = `${progress}%`;
+        }
+        
+        // 生成学生列表
+        function generateStudentList() {
+            students.forEach(student => {
+                const studentElement = document.createElement('div');
+                studentElement.className = 'student-item';
+                studentElement.textContent = student;
+                elements.studentList.appendChild(studentElement);
+            });
+        }
+        
+        // 随机抽选学生
+        function pickRandomStudent() {
+            // 移除之前选中的学生
+            const studentItems = elements.studentList.querySelectorAll('.student-item');
+            studentItems.forEach(item => item.classList.remove('selected'));
+            
+            // 随机选择一个学生
+            const randomIndex = Math.floor(Math.random() * students.length);
+            studentItems[randomIndex].classList.add('selected');
+            
+            // 显示提示
+            showHint(`请 ${students[randomIndex]} 回答问题`);
+        }
+        
+        // 修改事件监听器添加函数
+        function addEventListeners() {
+            // 模式切换按钮
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+            });
+            
+            // 上一个按钮
+            document.getElementById('prev-btn').addEventListener('click', () => {
+                if (gameState.mode === 'grid') {
+                    prevGridProblem();
+                } else {
+                    prevShape();
+                }
+            });
+            
+            // 下一个按钮
+            document.getElementById('next-btn').addEventListener('click', () => {
+                if (gameState.mode === 'grid') {
+                    nextGridProblem();
+                } else {
+                    nextShape();
+                }
+            });
+            
+            // 旋转按钮
+            document.getElementById('rotate-btn').addEventListener('click', rotateShape);
+            
+            // 检查答案按钮
+            document.getElementById('check-btn').addEventListener('click', checkAnswer);
+            
+            // 抽选学生按钮
+            document.getElementById('pick-student-btn').addEventListener('click', pickRandomStudent);
+        }
+        
+        // 旋转形状
+        function rotateShape() {
+            if (gameState.isRotating) {
+                // 如果已经在旋转，停止旋转
+                const shapeElement = elements.shapeDisplay.querySelector('.cube, .pyramid, .cylinder, .sphere, .prism');
+                if (shapeElement) {
+                    shapeElement.style.animation = 'none';
+                    gameState.isRotating = false;
+                }
+            } else {
+                // 开始旋转
+                const shapeElement = elements.shapeDisplay.querySelector('.cube, .pyramid, .cylinder, .sphere, .prism');
+                if (shapeElement) {
+                    shapeElement.style.animation = 'rotate 10s infinite linear';
+                    gameState.isRotating = true;
+                }
+            }
+        }
+        
+        // 下一个形状
+        function nextShape() {
+            gameState.currentShapeIndex = (gameState.currentShapeIndex + 1) % shapes.length;
+            renderCurrentShape();
+        }
+        
+        // 上一个形状
+        function prevShape() {
+            gameState.currentShapeIndex = (gameState.currentShapeIndex - 1 + shapes.length) % shapes.length;
+            renderCurrentShape();
+        }
+        
+        // 启动游戏
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>

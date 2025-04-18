@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>篮球比赛得分系统 - 管理后台</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/tailwindcss/2.2.19/tailwind.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #7c3aed;
+            --bg-light: #f9fafb;
+            --bg-dark: #111827;
+            --text-light: #1f2937;
+            --text-dark: #f3f4f6;
+        }
+        
+        body {
+            font-family: "Noto Sans SC", Tahoma, Arial, Roboto, "Droid Sans", "Helvetica Neue", "Droid Sans Fallback", "Heiti SC", "Hiragino Sans GB", Simsun, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .dark {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+        
+        .light {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+        
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        
+        .form-input:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+    </style>
+</head>
+<body class="light min-h-screen flex flex-col">
+    <!-- 登录页面 -->
+    <div id="login-page" class="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <i class="fas fa-basketball-ball text-4xl text-indigo-600 mb-4"></i>
+                <h1 class="text-2xl font-bold">篮球比赛得分系统</h1>
+                <p class="text-gray-500 dark:text-gray-400">管理员登录</p>
+            </div>
+            
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">用户名</label>
+                    <input type="text" id="username" name="username" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="请输入用户名" required>
+                </div>
+                
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">密码</label>
+                    <input type="password" id="password" name="password" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="请输入密码" required>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">记住我</label>
+                    </div>
+                    
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">忘记密码?</a>
+                    </div>
+                </div>
+                
+                <div>
+                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        登录
+                    </button>
+                </div>
+                
+                <div id="login-error" class="text-red-500 text-center hidden">
+                    用户名或密码错误，请重试。
+                </div>
+            </form>
+            
+            <div class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                <a href="index.html" class="font-medium text-indigo-600 hover:text-indigo-500">
+                    <i class="fas fa-arrow-left mr-1"></i> 返回前台页面
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理后台主界面 -->
+    <div id="admin-dashboard" class="hidden flex-1 flex flex-col md:flex-row">
+        <!-- 侧边栏 -->
+        <aside class="sidebar bg-indigo-800 text-white w-64 flex-shrink-0 md:sticky md:top-0 md:h-screen">
+            <div class="p-4 flex justify-between items-center border-b border-indigo-700">
+                <div class="flex items-center">
+                    <i class="fas fa-basketball-ball text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">管理后台</h1>
+                </div>
+                <button id="sidebar-close" class="md:hidden text-white focus:outline-none">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <nav class="mt-4">
+                <ul>
+                    <li>
+                        <a href="#dashboard" class="nav-link flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700 active">
+                            <i class="fas fa-tachometer-alt w-6"></i>
+                            <span>控制面板</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#matches" class="nav-link flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700">
+                            <i class="fas fa-trophy w-6"></i>
+                            <span>比赛管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#teams" class="nav-link flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700">
+                            <i class="fas fa-users w-6"></i>
+                            <span>球队管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#players" class="nav-link flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700">
+                            <i class="fas fa-user-alt w-6"></i>
+                            <span>球员管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#scores" class="nav-link flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700">
+                            <i class="fas fa-chart-line w-6"></i>
+                            <span>得分记录</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#settings" class="nav-link flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700">
+                            <i class="fas fa-cog w-6"></i>
+                            <span>系统设置</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="mt-auto p-4 border-t border-indigo-700">
+                <div class="flex items-center mb-4">
+                    <img src="https://via.placeholder.com/40/4F46E5/FFFFFF?text=A" alt="Admin" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                        <div class="font-medium">管理员</div>
+                        <div class="text-xs text-indigo-200">admin@example.com</div>
+                    </div>
+                </div>
+                <button id="logout-btn" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded-lg transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2"></i> 退出登录
+                </button>
+            </div>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="flex-1 bg-gray-100 dark:bg-gray-900">
+            <!-- 顶部导航 -->
+            <header class="bg-white dark:bg-gray-800 shadow-md">
+                <div class="flex justify-between items-center px-4 py-3">
+                    <button id="sidebar-toggle" class="md:hidden text-gray-500 dark:text-gray-400 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    
+                    <div class="flex items-center space-x-4">
+                        <button id="theme-toggle-admin" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-moon text-xl text-gray-600 dark:text-gray-300"></i>
+                        </button>
+                        
+                        <div class="relative">
+                            <button class="flex items-center focus:outline-none">
+                                <i class="fas fa-bell text-xl text-gray-600 dark:text-gray-300"></i>
+                                <span class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="p-6">
+                <!-- 控制面板 -->
+                <div id="dashboard-content" class="page-content">
+                    <h2 class="text-2xl font-bold mb-6">控制面板</h2>
+                    
+                    <!-- 数据概览卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 mr-4">
+                                    <i class="fas fa-trophy text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm">总比赛场次</p>
+                                    <h3 class="text-2xl font-bold">24</h3>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-sm text-green-600 dark:text-green-400">
+                                <i class="fas fa-arrow-up mr-1"></i> 较上月增长 12%
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 mr-4">
+                                    <i class="fas fa-users text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm">参赛球队</p>
+                                    <h3 class="text-2xl font-bold">8</h3>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-sm text-green-600 dark:text-green-400">
+                                <i class="fas fa-arrow-up mr-1"></i> 新增 2 支球队
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 mr-4">
+                                    <i class="fas fa-user-alt text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm">注册球员</p>
+                                    <h3 class="text-2xl font-bold">86</h3>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-sm text-green-600 dark:text-green-400">
+                                <i class="fas fa-arrow-up mr-1"></i> 较上月增长 8%
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 mr-4">
+                                    <i class="fas fa-chart-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm">总得分</p>
+                                    <h3 class="text-2xl font-bold">5,728</h3>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-sm text-green-600 dark:text-green-400">
+                                <i class="fas fa-arrow-up mr-1"></i> 平均每场 238.7 分
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 最近比赛和快速操作 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                <h3 class="font-bold text-lg">最近比赛</h3>
+                                <a href="#matches" class="text-indigo-600 hover:text-indigo-500 text-sm">查看全部</a>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="bg-gray-50 dark:bg-gray-700">
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">比赛ID</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">类型</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">日期</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">对阵</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">比分</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">地点</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">状态</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">#001</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">常规赛</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">2023-11-15</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">红队 vs 蓝队</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">89 : 76</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">市体育馆</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs">已结束</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <button class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-900 mr-2">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                <button class="text-blue-600 hover:text-blue-900">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">#002</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">季后赛</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">2023-11-12</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">绿队 vs 黄队</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">92 : 88</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">市体育馆</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs">已结束</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <button class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-900 mr-2">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                <button class="text-blue-600 hover:text-blue-900">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">#003</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">友谊赛</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">2023-11-10</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">紫队 vs 灰队</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">78 : 82</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">区体育中心</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs">已结束</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <button class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-900 mr-2">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                <button class="text-blue-600 hover:text-blue-900">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">#004</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">常规赛</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">2023-11-18</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">红队 vs 绿队</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">-- : --</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">市体育馆</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <span class="px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-xs">未开始</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <button class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-900 mr-2">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                <button class="text-blue-600 hover:text-blue-900">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">#005</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">常规赛</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">2023-11-20</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">蓝队 vs 黄队</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">-- : --</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">区体育中心</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <span class="px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-xs">未开始</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <button class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-900 mr-2">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                <button class="text-blue-600 hover:text-blue-900">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                <h3 class="font-bold text-lg">快速操作</h3>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                <button class="w-full flex items-center justify-center px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors">
+                                    <i class="fas fa-plus-circle mr-2"></i> 添加新比赛
+                                </button>
+                                <button class="w-full flex items-center justify-center px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+                                    <i class="fas fa-user-plus mr-2"></i> 添加新球员
+                                </button>
+                                <button class="w-full flex items-center justify-center px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                                    <i class="fas fa-users-cog mr-2"></i> 添加新球队
+                                </button>
+                                <button class="w-full flex items-center justify-center px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+                                    <i class="fas fa-chart-bar mr-2"></i> 生成数据报表
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 添加比赛表单 -->
+                    <div id="add-match-form-container" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-lg">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-xl font-bold">添加比赛</h3>
+                                <button id="close-match-form" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <form id="add-match-form" class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="match-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">比赛类型</label>
+                                        <select id="match-type" name="match-type" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                            <option value="常规赛">常规赛</option>
+                                            <option value="季后赛">季后赛</option>
+                                            <option value="锦标赛">锦标赛</option>
+                                            <option value="友谊赛">友谊赛</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="match-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">比赛日期</label>
+                                        <input type="date" id="match-date" name="match-date" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label for="match-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">比赛时间</label>
+                                        <input type="time" id="match-time" name="match-time" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label for="match-location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">比赛地点</label>
+                                        <input type="text" id="match-location" name="match-location" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="请输入比赛地点">
+                                    </div>
+                                    <div>
+                                        <label for="match-team1" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">主队</label>
+                                        <select id="match-team1" name="match-team1" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                            <option value="红队">红队</option>
+                                            <option value="蓝队">蓝队</option>
+                                            <option value="绿队">绿队</option>
+                                            <option value="黄队">黄队</option>
+                                            <option value="紫队">紫队</option>
+                                            <option value="灰队">灰队</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="match-team2" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">客队</label>
+                                        <select id="match-team2" name="match-team2" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                            <option value="蓝队">蓝队</option>
+                                            <option value="红队">红队</option>
+                                            <option value="绿队">绿队</option>
+                                            <option value="黄队">黄队</option>
+                                            <option value="紫队">紫队</option>
+                                            <option value="灰队">灰队</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="match-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">比赛状态</label>
+                                        <select id="match-status" name="match-status" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                            <option value="未开始">未开始</option>
+                                            <option value="进行中">进行中</option>
+                                            <option value="已结束">已结束</option>
+                                            <option value="已取消">已取消</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="match-score1" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">主队得分</label>
+                                        <input type="number" id="match-score1" name="match-score1" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="0" min="0">
+                                    </div>
+                                    <div>
+                                        <label for="match-score2" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">客队得分</label>
+                                        <input type="number" id="match-score2" name="match-score2" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="0" min="0">
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-6 flex justify-end space-x-3">
+                                    <button type="button" id="cancel-match-btn" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors">
+                                        取消
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                        保存
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 比赛管理 -->
+                <div id="matches-content" class="page-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">比赛管理</h2>
+                        <button id="add-match-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center">
+                            <i class="fas fa-plus-circle mr-2"></i> 添加比赛
+                        </button>
+                    </div>
+                    
+                    <!-- 筛选和搜索 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label for="filter-match-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">比赛类型</label>
+                                <select id="filter-match-type" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-lg">
+                                    <option value="">全部类型</option>
+                                    <option value="常规赛">常规赛</option>
+                                    <option value="季后赛">季后赛</option>
+                                    <option value="季前赛">季前赛</option>
+                                    <option value="友谊赛">友谊赛</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="filter-match-team" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">球队</label>
+                                <select id="filter-match-team" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-lg">
+                                    <option value="">全部球队</option>
+                                    <option value="红队">红队</option>
+                                    <option value="蓝队">蓝队</option>
+                                    <option value="绿队">绿队</option>
+                                    <option value="黄队">黄队</option>
+                                    <option value="紫队">紫队</option>
+                                    <option value="灰队">灰队</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="filter-match-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">状态</label>
+                                <select id="filter-match-status" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-lg">
+                                    <option value="">全部状态</option>
+                                    <option value="未开始">未开始</option>
+                                    <option value="进行中">进行中</option>
+                                    <option value="已结束">已结束</option>
+                                    <option value="已取消">已取消</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="search-match" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">搜索</label>
+                                <div class="relative">
+                                    <input type="text" id="search-match" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-lg pr-10" placeholder="搜索比赛...">
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 比赛列表 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="bg-gray-50 dark:bg-gray-700">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">比赛ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">类型</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">时间</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">对阵</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">比分</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">地点</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">状态</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="matches-table-body">
+                                    <!-- 比赛列表将通过 JavaScript 动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 border-t border-gray-200 dark:border-gray-800 sm:px-6 flex items-center justify-between">
+                            <div class="flex-1 flex justify-between sm:hidden">
+                                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                    上一页
+                                </button>
+                                <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                    下一页
+                                </button>
+                            </div>
+                            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                                        显示第
+                                        <span class="font-medium">1</span>
+                                        到
+                                        <span class="font-medium">10</span>
+                                        条，共
+                                        <span class="font-medium" id="total-matches">20</span>
+                                        条结果
+                                    </p>
+                                </div>
+                                <div>
+                                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                            <span class="sr-only">上一页</span>
+                                            <i class="fas fa-chevron-left text-xs"></i>
+                                        </a>
+                                        <a href="#" aria-current="page" class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                            1
+                                        </a>
+                                        <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                            2
+                                        </a>
+                                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                            <span class="sr-only">下一页</span>
+                                            <i class="fas fa-chevron-right text-xs"></i>
+                                        </a>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 球队管理 -->
+                <div id="teams-content" class="page-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">球队管理</h2>
+                        <button id="add-team-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center">
+                            <i class="fas fa-plus-circle mr-2"></i> 添加球队
+                        </button>
+                    </div>
+                    
+                    <!-- 球队列表 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- 红队 -->
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                            <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4 text-white">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-bold text-lg">红队</h3>
+                                    <div class="flex space-x-2">
+                                        <button class="p-1 hover:bg-white hover:bg-opacity-20 rounded">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="p-1 hover:bg-white hover:bg-opacity-20 rounded">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-4">
+                                    <img src="https://via.placeholder.com/80/FF5733/FFFFFF?text=红队" alt="红队" class="w-16 h-16 rounded-full mr-4">
+                                    <div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">成立时间</div>
+                                        <div class="font-medium">2020年3月</div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">球员数量</div>
+                                        <div class="font-medium">15 人</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">胜/负</div>
+                                        <div class="font-medium">12/4</div>
+                                    </div>
+                                </div>
+                                <button class="w-full flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                    <i class="fas fa-users mr-2"></i> 查看球员
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 蓝队 -->
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                            <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4 text-white">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-bold text-lg">蓝队</h3>
+                                    <div class="flex space-x-2">
+                                        <button class="p-1 hover:bg-white hover:bg-opacity-20 rounded">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="p-1 hover:bg-white hover:bg-opacity-20 rounded">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-4">
+                                    <img src="https://via.placeholder.com/80/3498DB/FFFFFF?text=蓝队" alt="蓝队" class="w-16 h-16 rounded-full mr-4">
+                                    <div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">成立时间</div>
+                                        <div class="font-medium">2020年5月</div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">球员数量</div>
+                                        <div class="font-medium">14 人</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">胜/负</div>
+                                        <div class="font-medium">10/6</div>
+                                    </div>
+                                </div>
+                                <button class="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-users mr-2"></i> 查看球员
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 绿队 -->
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                            <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4 text-white">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-bold text-lg">绿队</h3>
+                                    <div class="flex space-x-2">
+                                        <button class="p-1 hover:bg-white hover:bg-opacity-20 rounded">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="p-1 hover:bg-white hover:bg-opacity-20 rounded">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-4">
+                                    <img src="https://via.placeholder.com/80/27AE60/FFFFFF?text=绿队" alt="绿队" class="w-16 h-16 rounded-full mr-4">
+                                    <div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">成立时间</div>
+                                        <div class="font-medium">2021年1月</div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">球员数量</div>
+                                        <div class="font-medium">13 人</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">胜/负</div>
+                                        <div class="font-medium">9/7</div>
+                                    </div>
+                                </div>
+                                <button class="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                    <i class="fas fa-users mr-2"></i> 查看球员
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 添加球队表单 -->
+                    <div id="add-team-form-container" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-xl font-bold">添加新球队</h3>
+                                <button id="close-team-form" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <form id="add-team-form" class="space-y-4">
+                                <div>
+                                    <label for="team-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">球队名称</label>
+                                    <input type="text" id="team-name" name="team-name" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="请输入球队名称" required>
+                                </div>
+                                
+                                <div>
+                                    <label for="team-color" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">球队颜色</label>
+                                    <input type="color" id="team-color" name="team-color" class="form-input w-full h-10 px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" value="#4F46E5">
+                                </div>
+                                
+                                <div>
+                                    <label for="team-founded" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">成立时间</label>
+                                    <input type="date" id="team-founded" name="team-founded" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                </div>
+                                
+                                <div>
+                                    <label for="team-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">球队简介</label>
+                                    <textarea id="team-description" name="team-description" rows="3" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="请输入球队简介..."></textarea>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-3 pt-4">
+                                    <button type="button" id="cancel-team-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                                        取消
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                        保存球队
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 球员管理 -->
+                <div id="players-content" class="page-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">球员管理</h2>
+                        <button id="add-player-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center">
+                            <i class="fas fa-plus-circle mr-2"></i> 添加球员
+                        </button>
+                    </div>
+                    
+                    <!-- 筛选和搜索 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="filter-team" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">所属球队</label>
+                                <select id="filter-team" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                    <option value="">全部球队</option>
+                                    <option value="red">红队</option>
+                                    <option value="blue">蓝队</option>
+                                    <option value="green">绿队</option>
+                                    <option value="yellow">黄队</option>
+                                    <option value="purple">紫队</option>
+                                    <option value="gray">灰队</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="filter-position" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">场上位置</label>
+                                <select id="filter-position" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                    <option value="">全部位置</option>
+                                    <option value="PG">控球后卫 (PG)</option>
+                                    <option value="SG">得分后卫 (SG)</option>
+                                    <option value="SF">小前锋 (SF)</option>
+                                    <option value="PF">大前锋 (PF)</option>
+                                    <option value="C">中锋 (C)</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="search-player" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">搜索</label>
+                                <div class="relative">
+                                    <input type="text" id="search-player" class="form-input w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="搜索球员姓名或号码...">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 球员列表 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="bg-gray-50 dark:bg-gray-700">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">球员ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">姓名</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">号码</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">位置</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">球队</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">场均得分</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">#P001</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <div class="flex items-center">
+                                                <img src="https://via.placeholder.com/40/FF5733/FFFFFF?text=张" class="w-8 h-8 rounded-full mr-3">
+                                                <span>张三</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">23</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">小前锋 (SF)</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">红队</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">18.5</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-900 mr-2">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                            <button class="text-blue-600 hover:text-blue-900">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">#P002</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <div class="flex items-center">
+                                                <img src="https://via.placeholder.com/40/3498DB/FFFFFF?text=李" class="w-8 h-8 rounded-full mr-3">
+                                                <span>李四</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">11</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">控球后卫 (PG)</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">蓝队</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">12.3</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-900 mr-2">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                            <button class="text-blue-600 hover:text-blue-900">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">#P003</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <div class="flex items-center">
+                                                <img src="https://via.placeholder.com/40/27AE60/FFFFFF?text=王" class="w-8 h-8 rounded-full mr-3">
+                                                <span>王五</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">33</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">中锋 (C)</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">绿队</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">15.7</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-900 mr-2">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                            <button class="text-blue-600 hover:text-blue-900">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 分页 -->
+                        <div class="px-6 py-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
+                            <div>
+                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                    显示第 <span class="font-medium">1</span> 至 <span class="font-medium">3</span> 条，共 <span class="font-medium">15</span> 条结果
+                                </p>
+                            </div>
+                            <div>
+                                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <span class="sr-only">上一页</span>
+                                        <i class="fas fa-chevron-left text-xs"></i>
+                                    </a>
+                                    <a href="#" aria-current="page" class="z-10 bg-indigo-50 dark:bg-indigo-900 border-indigo-500 dark:border-indigo-500 text-indigo-600 dark:text-indigo-200 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                        1
+                                    </a>
+                                    <a href="#" class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                        2
+                                    </a>
+                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <span class="sr-only">下一页</span>
+                                        <i class="fas fa-chevron-right text-xs"></i>
+                                    </a>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 添加球员表单模态框 -->
+                    <div id="add-player-form-container" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-xl font-bold">添加新球员</h3>
+                                <button id="close-player-form" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <form id="add-player-form" class="space-y-4">
+                                <div>
+                                    <label for="player-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">球员姓名</label>
+                                    <input type="text" id="player-name" name="player-name" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="请输入球员姓名" required>
+                                </div>
+                                
+                                <div>
+                                    <label for="player-number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">球衣号码</label>
+                                    <input type="number" id="player-number" name="player-number" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="请输入球衣号码" required>
+                                </div>
+                                
+                                <div>
+                                    <label for="player-position" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">场上位置</label>
+                                    <select id="player-position" name="player-position" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" required>
+                                        <option value="">请选择位置</option>
+                                        <option value="PG">控球后卫 (PG)</option>
+                                        <option value="SG">得分后卫 (SG)</option>
+                                        <option value="SF">小前锋 (SF)</option>
+                                        <option value="PF">大前锋 (PF)</option>
+                                        <option value="C">中锋 (C)</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label for="player-team" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">所属球队</label>
+                                    <select id="player-team" name="player-team" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" required>
+                                        <option value="">请选择球队</option>
+                                        <option value="red">红队</option>
+                                        <option value="blue">蓝队</option>
+                                        <option value="green">绿队</option>
+                                        <option value="yellow">黄队</option>
+                                        <option value="purple">紫队</option>
+                                        <option value="gray">灰队</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-3 pt-4">
+                                    <button type="button" id="cancel-player-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                                        取消
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                        保存球员
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <!-- 得分记录 -->
+                <div id="scores-content" class="page-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">得分记录</h2>
+                        <button id="add-score-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center">
+                            <i class="fas fa-plus-circle mr-2"></i> 添加得分记录
+                        </button>
+                    </div>
+                    
+                    <!-- 筛选和搜索 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label for="filter-score-match" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">比赛</label>
+                                <select id="filter-score-match" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                    <option value="">全部比赛</option>
+                                    <option value="001">红队 vs 蓝队 (2023-11-15)</option>
+                                    <option value="002">绿队 vs 黄队 (2023-11-12)</option>
+                                    <option value="003">紫队 vs 灰队 (2023-11-10)</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="filter-score-player" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">球员</label>
+                                <select id="filter-score-player" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                    <option value="">全部球员</option>
+                                    <option value="P001">张三 (红队)</option>
+                                    <option value="P002">李四 (蓝队)</option>
+                                    <option value="P003">王五 (绿队)</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="filter-score-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">得分类型</label>
+                                <select id="filter-score-type" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none">
+                                    <option value="">全部类型</option>
+                                    <option value="1">罚球 (1分)</option>
+                                    <option value="2">两分球</option>
+                                    <option value="3">三分球</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="search-score" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">搜索</label>
+                                <div class="relative">
+                                    <input type="text" id="search-score" class="form-input w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="搜索...">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 得分记录列表 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="bg-gray-50 dark:bg-gray-700">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">记录ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">比赛</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">球员</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">得分类型</th> 
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">时间</th> 
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <!-- 示例数据 -->
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">    
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">#S001</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <div class="flex items-center"> 
+                                                <img src="https://via.placeholder.com/40/3498DB/FFFFFF?text=红" class="w-8 h-8 rounded-full mr-3">
+                                                <span>红队 vs 蓝队</span>   
+                                            </div>  
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <div class="flex items-center">
+                                                <img src="https://via.placeholder.com/40/3498DB/FFFFFF?text=李" class="w-8 h-8 rounded-full mr-3">
+                                                <span>李四</span>   
+                                            </div>  
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">罚球 (1分)</span>    
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">2023-11-15 15:30</td>   
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                                <i class="fas fa-edit"></i> 编辑
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-900 mr-2">   
+                                                <i class="fas fa-trash-alt"></i> 删除
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">#S002</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <div class="flex items-center">
+                                                <img src="https://via.placeholder.com/40/FF5733/FFFFFF?text=绿" class="w-8 h-8 rounded-full mr-3">
+                                                <span>绿队 vs 黄队</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <div class="flex items-center">
+                                                <img src="https://via.placeholder.com/40/FF5733/FFFFFF?text=张" class="w-8 h-8 rounded-full mr-3">
+                                                <span>张三</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">三分球 (3分)</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">2023-11-12 15:45</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                                <i class="fas fa-edit"></i> 编辑
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-900 mr-2">
+                                                <i class="fas fa-trash-alt"></i> 删除
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- 添加得分记录模态框 -->
+                    <div id="add-score-form-container" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-xl font-bold">添加得分记录</h3>
+                                <button id="close-score-form" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <form id="add-score-form" class="space-y-4">
+                                <div>
+                                    <label for="score-match" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">比赛</label>
+                                    <select id="score-match" name="score-match" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" required>
+                                        <option value="">请选择比赛</option>
+                                        <option value="001">红队 vs 蓝队 (2023-11-15)</option>
+                                        <option value="002">绿队 vs 黄队 (2023-11-12)</option>
+                                        <option value="003">紫队 vs 灰队 (2023-11-10)</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label for="score-player" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">球员</label>
+                                    <select id="score-player" name="score-player" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" required>
+                                        <option value="">请选择球员</option>
+                                        <option value="P001">张三 (红队)</option>
+                                        <option value="P002">李四 (蓝队)</option>
+                                        <option value="P003">王五 (绿队)</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label for="score-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">得分类型</label>
+                                    <select id="score-type" name="score-type" class="form-select w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" required>
+                                        <option value="">请选择得分类型</option>
+                                        <option value="1">罚球 (1分)</option>
+                                        <option value="2">两分球</option>
+                                        <option value="3">三分球</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label for="score-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">时间</label>
+                                    <input type="datetime-local" id="score-time" name="score-time" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" required>
+                                </div>
+                                
+                                <div>
+                                    <label for="score-notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">备注</label>
+                                    <textarea id="score-notes" name="score-notes" rows="2" class="form-input w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg focus:outline-none" placeholder="可选备注信息..."></textarea>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-3 pt-4">
+                                    <button type="button" id="cancel-score-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                                        取消
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                        保存记录
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                                                    
+                
+<!-- 在body结束标签前添加以下脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 登录功能
+            const loginForm = document.getElementById('login-form');
+            const loginPage = document.getElementById('login-page');
+            const adminDashboard = document.getElementById('admin-dashboard');
+            const logoutBtn = document.getElementById('logout-btn');
+            const loginError = document.getElementById('login-error');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    
+                    // 简单的登录验证，实际应用中应该使用更安全的方式
+                    if (username === 'admin' && password === 'admin123') {
+                        loginPage.classList.add('hidden');
+                        adminDashboard.classList.remove('hidden');
+                        adminDashboard.classList.add('flex');
+                        
+                        // 保存登录状态到 localStorage
+                        localStorage.setItem('isLoggedIn', 'true');
+                    } else {
+                        loginError.classList.remove('hidden');
+                        setTimeout(() => {
+                            loginError.classList.add('hidden');
+                        }, 3000);
+                    }
+                });
+            }
+            
+            // 检查是否已登录
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                loginPage.classList.add('hidden');
+                adminDashboard.classList.remove('hidden');
+                adminDashboard.classList.add('flex');
+            }
+            
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    adminDashboard.classList.add('hidden');
+                    adminDashboard.classList.remove('flex');
+                    loginPage.classList.remove('hidden');
+                    loginError.classList.add('hidden');
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+                    
+                    // 清除登录状态
+                    localStorage.removeItem('isLoggedIn');
+                });
+            }
+            
+            // 侧边栏切换
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pageContents = document.querySelectorAll('.page-content');
+            
+            navLinks.forEach(navLink => {
+                navLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = this.getAttribute('href').substring(1);
+                    
+                    // 移除所有活动状态
+                    navLinks.forEach(navLink => {
+                        navLink.classList.remove('active', 'bg-indigo-700');
+                    });
+                    this.classList.add('active', 'bg-indigo-700');
+                    
+                    // 切换内容显示
+                    pageContents.forEach(page => {
+                        page.classList.add('hidden');
+                    });
+                    document.getElementById(target + '-content').classList.remove('hidden');
+                });
+            });
+            
+            // 移动端侧边栏切换
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebarClose = document.getElementById('sidebar-close');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.add('open');
+                });
+            }
+            
+            if (sidebarClose) {
+                sidebarClose.addEventListener('click', function() {
+                    sidebar.classList.remove('open');
+                });
+            }
+            
+            // 主题切换
+            const themeToggle = document.getElementById('theme-toggle-admin');
+            const body = document.body;
+            
+            // 从本地存储中获取用户主题偏好
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                body.classList.remove('light', 'dark');
+                body.classList.add(savedTheme);
+                updateThemeIcon(savedTheme === 'dark');
+            }
+            
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    const isDark = body.classList.contains('dark');
+                    
+                    body.classList.remove('light', 'dark');
+                    body.classList.add(isDark ? 'light' : 'dark');
+                    
+                    // 保存用户主题偏好到本地存储
+                    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+                    
+                    updateThemeIcon(!isDark);
+                });
+            }
+            
+            function updateThemeIcon(isDark) {
+                if (themeToggle) {
+                    const icon = themeToggle.querySelector('i');
+                    icon.classList.remove('fa-sun', 'fa-moon');
+                    icon.classList.add(isDark ? 'fa-sun' : 'fa-moon');
+                }
+            }
+
+            // 模态框相关
+            // 球队模态框
+            const addTeamBtn = document.getElementById('add-team-btn');
+            const addTeamFormContainer = document.getElementById('add-team-form-container');
+            const closeTeamForm = document.getElementById('close-team-form');
+            const cancelTeamBtn = document.getElementById('cancel-team-btn');
+            const addTeamForm = document.getElementById('add-team-form');
+            
+            if (addTeamBtn && addTeamFormContainer) {
+                addTeamBtn.addEventListener('click', function() {
+                    addTeamFormContainer.classList.remove('hidden');
+                });
+            }
+            
+            if (closeTeamForm && addTeamFormContainer) {
+                closeTeamForm.addEventListener('click', function() {
+                    addTeamFormContainer.classList.add('hidden');
+                });
+            }
+            
+            if (cancelTeamBtn && addTeamFormContainer) {
+                cancelTeamBtn.addEventListener('click', function() {
+                    addTeamFormContainer.classList.add('hidden');
+                });
+            }
+            
+            if (addTeamForm) {
+                addTeamForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const teamName = document.getElementById('team-name').value;
+                    const teamColor = document.getElementById('team-color').value;
+                    const teamFounded = document.getElementById('team-founded').value;
+                    
+                    // 这里可以添加保存球队信息的逻辑
+                    console.log('保存球队信息:', { teamName, teamColor, teamFounded });
+                    
+                    // 关闭模态框并清空表单
+                    addTeamFormContainer.classList.add('hidden');
+                    this.reset();
+                    
+                    // 提示保存成功
+                    alert('球队信息保存成功！');
+                });
+            }
+            
+            // 球员模态框
+            const addPlayerBtn = document.getElementById('add-player-btn');
+            const addPlayerFormContainer = document.getElementById('add-player-form-container');
+            const closePlayerForm = document.getElementById('close-player-form');
+            const cancelPlayerBtn = document.getElementById('cancel-player-btn');
+            const addPlayerForm = document.getElementById('add-player-form');
+            
+            if (addPlayerBtn && addPlayerFormContainer) {
+                addPlayerBtn.addEventListener('click', function() {
+                    addPlayerFormContainer.classList.remove('hidden');
+                });
+            }
+            
+            if (closePlayerForm && addPlayerFormContainer) {
+                closePlayerForm.addEventListener('click', function() {
+                    addPlayerFormContainer.classList.add('hidden');
+                });
+            }
+            
+            if (cancelPlayerBtn && addPlayerFormContainer) {
+                cancelPlayerBtn.addEventListener('click', function() {
+                    addPlayerFormContainer.classList.add('hidden');
+                });
+            }
+            
+            if (addPlayerForm) {
+                addPlayerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const playerName = document.getElementById('player-name').value;
+                    const playerNumber = document.getElementById('player-number').value;
+                    const playerPosition = document.getElementById('player-position').value;
+                    const playerTeam = document.getElementById('player-team').value;
+                    
+                    // 这里可以添加保存球员信息的逻辑
+                    console.log('保存球员信息:', { playerName, playerNumber, playerPosition, playerTeam });
+                    
+                    // 关闭模态框并清空表单
+                    addPlayerFormContainer.classList.add('hidden');
+                    this.reset();
+                    
+                    // 提示保存成功
+                    alert('球员信息保存成功！');
+                });
+            }
+            
+            // 得分记录模态框
+            const addScoreBtn = document.getElementById('add-score-btn');
+            const addScoreFormContainer = document.getElementById('add-score-form-container');
+            const closeScoreForm = document.getElementById('close-score-form');
+            const cancelScoreBtn = document.getElementById('cancel-score-btn');
+            const addScoreForm = document.getElementById('add-score-form');
+            
+            if (addScoreBtn && addScoreFormContainer) {
+                addScoreBtn.addEventListener('click', function() {
+                    addScoreFormContainer.classList.remove('hidden');
+                });
+            }
+            
+            if (closeScoreForm && addScoreFormContainer) {
+                closeScoreForm.addEventListener('click', function() {
+                    addScoreFormContainer.classList.add('hidden');
+                });
+            }
+            
+            if (cancelScoreBtn && addScoreFormContainer) {
+                cancelScoreBtn.addEventListener('click', function() {
+                    addScoreFormContainer.classList.add('hidden');
+                });
+            }
+            
+            if (addScoreForm) {
+                addScoreForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const scoreMatch = document.getElementById('score-match').value;
+                    const scorePlayer = document.getElementById('score-player').value;
+                    const scoreType = document.getElementById('score-type').value;
+                    const scoreTime = document.getElementById('score-time').value;
+                    
+                    // 这里可以添加保存得分记录的逻辑
+                    console.log('保存得分记录:', { scoreMatch, scorePlayer, scoreType, scoreTime });
+                    
+                    // 关闭模态框并清空表单
+                    addScoreFormContainer.classList.add('hidden');
+                    this.reset();
+                    
+                    // 提示保存成功
+                    alert('得分记录保存成功！');
+                });
+            }
+            
+            // 比赛管理模态框
+            const addMatchBtn = document.getElementById('add-match-btn');
+            const addMatchFormContainer = document.getElementById('add-match-form-container');
+            const closeMatchForm = document.getElementById('close-match-form');
+            const cancelMatchBtn = document.getElementById('cancel-match-btn');
+            const addMatchForm = document.getElementById('add-match-form');
+            
+            if (addMatchBtn && addMatchFormContainer) {
+                addMatchBtn.addEventListener('click', function() {
+                    addMatchFormContainer.classList.remove('hidden');
+                });
+            }
+            
+            if (closeMatchForm && addMatchFormContainer) {
+                closeMatchForm.addEventListener('click', function() {
+                    addMatchFormContainer.classList.add('hidden');
+                });
+            }
+            
+            if (cancelMatchBtn && addMatchFormContainer) {
+                cancelMatchBtn.addEventListener('click', function() {
+                    addMatchFormContainer.classList.add('hidden');
+                });
+            }
+            
+            if (addMatchForm) {
+                addMatchForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const matchType = document.getElementById('match-type').value;
+                    const matchDate = document.getElementById('match-date').value;
+                    const matchTime = document.getElementById('match-time').value;
+                    const matchLocation = document.getElementById('match-location').value;
+                    const matchTeam1 = document.getElementById('match-team1').value;
+                    const matchTeam2 = document.getElementById('match-team2').value;
+                    const matchStatus = document.getElementById('match-status').value;
+                    const matchScore1 = document.getElementById('match-score1').value;
+                    const matchScore2 = document.getElementById('match-score2').value;
+                    
+                    // 这里可以添加保存比赛信息的逻辑
+                    const matchData = {
+                        type: matchType,
+                        date: matchDate,
+                        time: matchTime,
+                        location: matchLocation,
+                        team1: matchTeam1,
+                        team2: matchTeam2,
+                        status: matchStatus,
+                        score1: matchScore1,
+                        score2: matchScore2
+                    };
+                    console.log('保存比赛信息:', matchData);
+                    
+                    // 简单的数据保存到 localStorage (模拟数据库操作)
+                    const matches = JSON.parse(localStorage.getItem('basketballMatches') || '[]');
+                    matchData.id = '#' + (matches.length + 1).toString().padStart(3, '0');
+                    matches.push(matchData);
+                    localStorage.setItem('basketballMatches', JSON.stringify(matches));
+                    
+                    // 更新表格中的显示
+                    updateMatchesTable();
+                    
+                    // 关闭模态框并清空表单
+                    addMatchFormContainer.classList.add('hidden');
+                    this.reset();
+                    
+                    // 提示保存成功
+                    alert('比赛信息保存成功！');
+                });
+            }
+            
+            // 更新比赛表格
+            function updateMatchesTable() {
+                const matchesTableBody = document.getElementById('matches-table-body');
+                if (!matchesTableBody) return;
+                
+                const matches = JSON.parse(localStorage.getItem('basketballMatches') || '[]');
+                matchesTableBody.innerHTML = '';
+                
+                matches.forEach(match => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700';
+                    
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">${match.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">${match.type}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">${match.date}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">${match.team1} vs ${match.team2}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${match.score1} : ${match.score2}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">${match.location}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                ${match.status === '已结束' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
+                                  match.status === '进行中' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 
+                                  match.status === '已取消' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 
+                                  'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}">
+                            ${match.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right">
+                        <button class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3 edit-match" data-id="${match.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 delete-match" data-id="${match.id}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                
+                matchesTableBody.appendChild(row);
+            });
+            
+            // 添加编辑和删除功能
+            const editButtons = document.querySelectorAll('.edit-match');
+            const deleteButtons = document.querySelectorAll('.delete-match');
+            
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const matchId = this.getAttribute('data-id');
+                    editMatch(matchId);
+                });
+            });
+            
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const matchId = this.getAttribute('data-id');
+                    deleteMatch(matchId);
+                });
+            });
+        }
+        
+        // 编辑比赛
+        function editMatch(matchId) {
+            const matches = JSON.parse(localStorage.getItem('basketballMatches') || '[]');
+            const match = matches.find(m => m.id === matchId);
+            
+            if (match) {
+                // 填充表单
+                document.getElementById('match-type').value = match.type;
+                document.getElementById('match-date').value = match.date;
+                document.getElementById('match-time').value = match.time || '';
+                document.getElementById('match-location').value = match.location;
+                document.getElementById('match-team1').value = match.team1;
+                document.getElementById('match-team2').value = match.team2;
+                document.getElementById('match-status').value = match.status;
+                document.getElementById('match-score1').value = match.score1;
+                document.getElementById('match-score2').value = match.score2;
+                
+                // 设置编辑状态
+                const form = document.getElementById('add-match-form');
+                form.setAttribute('data-edit-id', matchId);
+                
+                // 显示模态框
+                document.getElementById('add-match-form-container').classList.remove('hidden');
+            }
+        }
+        
+        // 删除比赛
+        function deleteMatch(matchId) {
+            if (confirm('确定要删除这场比赛吗？')) {
+                const matches = JSON.parse(localStorage.getItem('basketballMatches') || '[]');
+                const updatedMatches = matches.filter(m => m.id !== matchId);
+                localStorage.setItem('basketballMatches', JSON.stringify(updatedMatches));
+                updateMatchesTable();
+            }
+        }
+        
+        // 初始化加载比赛列表
+        updateMatchesTable();
+        
+        // 数据同步功能
+        const syncDataBtn = document.getElementById('sync-data-btn');
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>古诗词学习游戏</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .game-section, .search-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .poem-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .hint {
+            color: #666;
+            font-style: italic;
+        }
+        .score {
+            font-size: 24px;
+            color: #4CAF50;
+            margin: 10px 0;
+        }
+        #fileInput {
+            display: none;
+        }
+        .file-upload-btn {
+            background-color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>古诗词学习游戏</h1>
+        
+        <div class="game-section">
+            <h2>诗词猜谜游戏</h2>
+            <div id="game-area">
+                <p class="hint" id="current-hint"></p>
+                <input type="text" id="answer-input" placeholder="请输入诗句...">
+                <button onclick="checkAnswer()">提交答案</button>
+                <button onclick="nextQuestion()">下一题</button>
+                <div class="score">得分：<span id="score">0</span></div>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <h2>诗词搜索</h2>
+            <input type="text" id="search-input" placeholder="输入关键词搜索诗词...">
+            <button onclick="searchPoems()">搜索</button>
+            <div id="search-results"></div>
+        </div>
+
+        <div class="upload-section">
+            <h2>上传诗词</h2>
+            <input type="file" id="fileInput" accept=".json">
+            <button class="file-upload-btn" onclick="document.getElementById('fileInput').click()">选择JSON文件</button>
+        </div>
+    </div>
+
+    <script>
+        let poems = [];
+        let currentQuestion = null;
+        let score = 0;
+
+        // 加载默认诗词数据
+        fetch('古诗词.json')
+            .then(response => response.json())
+            .then(data => {
+                poems = data;
+                nextQuestion();
+            })
+            .catch(error => console.error('Error loading poems:', error));
+
+        // 文件上传处理
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    poems = JSON.parse(e.target.result);
+                    alert('诗词数据加载成功！');
+                    nextQuestion();
+                } catch (error) {
+                    alert('JSON格式错误，请检查文件格式！');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // 生成新问题
+        function nextQuestion() {
+            if (poems.length === 0) return;
+            const randomIndex = Math.floor(Math.random() * poems.length);
+            currentQuestion = poems[randomIndex];
+            document.getElementById('current-hint').textContent = currentQuestion.explanation;
+            document.getElementById('answer-input').value = '';
+        }
+
+        // 检查答案
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answer-input').value.trim();
+            if (!currentQuestion) return;
+
+            const correctAnswers = currentQuestion.content;
+            const isCorrect = correctAnswers.some(line => line.includes(userAnswer) || userAnswer.includes(line));
+
+            if (isCorrect) {
+                score += 10;
+                document.getElementById('score').textContent = score;
+                alert('回答正确！加10分！');
+                nextQuestion();
+            } else {
+                alert('回答错误，请继续努力！\n正确答案是：' + correctAnswers[0]);
+            }
+        }
+
+        // 搜索诗词
+        function searchPoems() {
+            const keyword = document.getElementById('search-input').value.trim();
+            if (!keyword) return;
+
+            const results = poems.filter(poem => 
+                poem.title.includes(keyword) || 
+                poem.author.includes(keyword) || 
+                poem.content.some(line => line.includes(keyword)) ||
+                poem.explanation.includes(keyword)
+            );
+
+            displaySearchResults(results);
+        }
+
+        // 显示搜索结果
+        function displaySearchResults(results) {
+            const resultsDiv = document.getElementById('search-results');
+            resultsDiv.innerHTML = '';
+
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<p>未找到相关诗词</p>';
+                return;
+            }
+
+            results.forEach(poem => {
+                const poemCard = document.createElement('div');
+                poemCard.className = 'poem-card';
+                poemCard.innerHTML = `
+                    <h3>${poem.title}</h3>
+                    <p>${poem.author}</p>
+                    <p>${poem.content.join('<br>')}</p>
+                    <p class="hint">${poem.explanation}</p>
+                `;
+                resultsDiv.appendChild(poemCard);
+            });
+        }
+    </script>
+</body>
+</html> 

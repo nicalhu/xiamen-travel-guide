@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四年级古诗词互动小游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #0984e3;
+            --secondary-color: #e17055;
+            --bg-light: #f5f6fa;
+            --bg-dark: #333;
+            --text-light: #333;
+            --text-dark: #f5f6fa;
+            --border-color: #ddd;
+            --success-color: #00b894;
+            --error-color: #d63031;
+            --highlight-color: #fdcb6e;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-light);
+        }
+        
+        /* 容器样式 */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* 头部样式 */
+        .header {
+            background: linear-gradient(135deg, #74b9ff, var(--primary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 { font-size: 28px; margin-bottom: 5px; }
+        .header p { font-size: 16px; opacity: 0.9; }
+        
+        /* 游戏区域样式 */
+        .game-area { padding: 30px; text-align: center; }
+        
+        /* 诗词容器样式 */
+        .poem-container { margin-bottom: 30px; position: relative; }
+        .poem-title { font-size: 24px; font-weight: bold; margin-bottom: 15px; color: var(--primary-color); }
+        .poem-author { font-size: 16px; margin-bottom: 20px; color: #636e72; }
+        .poem-content { font-size: 20px; line-height: 1.8; margin-bottom: 20px; text-align: center; }
+        .poem-line { margin-bottom: 10px; position: relative; }
+        
+        /* 字词样式 */
+        .word {
+            display: inline-block;
+            width: 30px;
+            height: 40px;
+            line-height: 40px;
+            margin: 0 5px;
+            border-bottom: 2px solid var(--border-color);
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .word.revealed { border-bottom-color: var(--primary-color); }
+        .word.hidden span { visibility: hidden; }
+        .word.hidden:after {
+            content: "?";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: var(--secondary-color);
+        }
+        
+        .word.correct {
+            color: var(--success-color);
+            font-weight: bold;
+            animation: bounce 0.5s;
+        }
+        
+        .word.incorrect {
+            color: var(--error-color);
+            text-decoration: line-through;
+        }
+        
+        /* 控制按钮样式 */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            outline: none;
+        }
+        
+        button:hover {
+            background-color: #74b9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(9, 132, 227, 0.3);
+        }
+        
+        button:disabled {
+            background-color: #b2bec3;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* 模式切换样式 */
+        .mode-switch, .game-modes {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn, .game-mode-btn {
+            padding: 8px 15px;
+            border: 2px solid var(--primary-color);
+            background-color: white;
+            color: var(--primary-color);
+            margin: 0 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mode-btn.active, .game-mode-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* 进度条样式 */
+        .progress {
+            height: 6px;
+            background-color: #dfe6e9;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        /* 其他组件样式 */
+        .score-display {
+            font-size: 18px;
+            margin-top: 15px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        
+        .hint-container {
+            margin-top: 15px;
+            min-height: 50px;
+            color: var(--secondary-color);
+            font-size: 16px;
+        }
+        
+        /* 学生选择器样式 */
+        .student-selector {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .student-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .student-item {
+            padding: 5px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .student-item:hover { background-color: #74b9ff; }
+        .student-item.selected {
+            background-color: var(--secondary-color);
+            animation: pulse 1s infinite;
+        }
+        
+        /* 记忆模式样式 */
+        .memory-mode {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-radius: 10px;
+            border: 2px dashed var(--primary-color);
+        }
+        
+        .memory-tip {
+            font-size: 16px;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+        
+        /* 星星容器样式 */
+        .stars-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            gap: 5px;
+        }
+        
+        .star {
+            font-size: 24px;
+            color: #dfe6e9;
+        }
+        
+        .star.earned {
+            color: var(--highlight-color);
+            animation: pulse 0.5s;
+        }
+        
+        /* 填空容器样式 */
+        .fill-blank-container { margin-top: 20px; }
+        
+        .fill-blank-line {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .fill-blank-word {
+            min-width: 40px;
+            height: 40px;
+            border-bottom: 2px solid var(--border-color);
+            margin: 0 5px;
+            text-align: center;
+            line-height: 40px;
+        }
+        
+        .fill-blank-input {
+            width: 80px;
+            height: 40px;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            text-align: center;
+            font-size: 18px;
+            margin: 0 5px;
+        }
+        
+        /* 动画效果 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        @keyframes fall {
+            to { transform: translateY(100vh); }
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 640px) {
+            .poem-title { font-size: 20px; }
+            .poem-content { font-size: 18px; }
+            .word { width: 25px; height: 35px; line-height: 35px; }
+            button { padding: 8px 15px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>古诗词互动小游戏</h1>
+            <p>四年级语文课堂</p>
+            <div class="timer" id="timer">60</div>
+        </div>
+        
+        <div class="game-area">
+            <div class="mode-switch">
+                <button class="mode-btn active" data-mode="recite">背诵模式</button>
+                <button class="mode-btn" data-mode="challenge">挑战模式</button>
+                <button class="mode-btn" data-mode="fill-blank">填空模式</button>
+            </div>
+            
+            <div class="game-modes">
+                <button class="game-mode-btn active" data-game="normal">普通模式</button>
+                <button class="game-mode-btn" data-game="time-challenge">限时挑战</button>
+                <button class="game-mode-btn" data-game="memory-master">记忆大师</button>
+            </div>
+            
+            <div class="category-selector">
+                <select id="category-select">
+                    <option value="all">全部诗词</option>
+                    <option value="田园诗系列">田园诗系列</option>
+                    <option value="古代诗人">古代诗人</option>
+                    <option value="送别诗">送别诗</option>
+                    <option value="托物言志诗">托物言志诗</option>
+                </select>
+            </div>
+            
+            <div class="memory-mode" id="memory-mode" style="display: none;">
+                <div class="memory-tip">记忆提示：</div>
+                <div id="memory-tip-content"></div>
+            </div>
+            
+            <div class="poem-container">
+                <div class="poem-title" id="poem-title">静夜思</div>
+                <div class="poem-author" id="poem-author">唐·李白</div>
+                <div class="poem-content" id="poem-content">
+                    <!-- 句子将通过JavaScript动态生成 -->
+                </div>
+                <div class="fill-blank-container" id="fill-blank-container" style="display: none;">
+                    <!-- 填空内容将通过JavaScript动态生成 -->
+                </div>
+                <div class="poem-explanation" id="poem-explanation" style="display: none;">
+                    <!-- 诗词释义将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <div class="stars-container" id="stars-container">
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+            </div>
+            
+            <div class="hint-container" id="hint-container"></div>
+            
+            <div class="controls">
+                <button id="reveal-btn">显示全诗</button>
+                <button id="hide-btn">隐藏全诗</button>
+                <button id="random-hide-btn">随机隐藏</button>
+                <button id="next-btn">下一首</button>
+                <button id="show-explanation-btn">显示释义</button>
+                <button id="check-answer-btn" style="display: none;">检查答案</button>
+            </div>
+            
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <div class="progress-info">
+                <span id="poems-learned">已学习: 0/0</span>
+                <span id="current-streak">连续正确: 0</span>
+            </div>
+            
+            <div class="score-display" id="score-display">得分: 0</div>
+            
+            <div class="student-selector">
+                <h3>抽选学生回答</h3>
+                <div class="student-list" id="student-list">
+                    <!-- 学生名单将通过JavaScript动态生成 -->
+                </div>
+                <button id="pick-student-btn" style="margin-top: 15px;">随机抽选</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="celebration" id="celebration"></div>
+    
+    <script>
+        // 古诗词数据
+        const poems = [
+            // 第一部分：田园诗系列
+            {
+                title: "过故人庄",
+                author: "【唐】孟浩然",
+                content: [
+                    "故人具鸡黍，",
+                    "邀我至田家。",
+                    "绿树村边合，",
+                    "青山郭外斜。",
+                    "开轩面场圃，",
+                    "把酒话桑麻。",
+                    "待到重阳日，",
+                    "还来就菊花。"
+                ],
+                category: "田园诗系列",
+                explanation: "这首诗描述了诗人拜访故友的情景。故友准备了鸡肉和黍米饭招待诗人，邀请他到乡间农舍做客。村庄四周绿树环绕，远处青山横斜。诗人在朋友家打开窗户面对田园，一边喝酒一边谈论农事。诗人约定重阳节时再来赏菊。"
+            },
+            {
+                title: "归园田居",
+                author: "【晋】陶渊明",
+                content: [
+                    "种豆南山下，",
+                    "草盛豆苗稀。",
+                    "晨兴理荒秽，",
+                    "带月荷锄归。",
+                    "道狭草木长，",
+                    "夕露沾我衣。",
+                    "衣沾不足惜，",
+                    "但使愿无违。"
+                ],
+                category: "田园诗系列",
+                explanation: "这首诗描述了陶渊明归隐田园后的生活。他在南山下种豆子，因为杂草茂盛，豆苗稀疏。清晨起来清理荒草，直到月亮升起才扛着锄头回家。回家的小路很窄，两旁草木茂盛，傍晚的露水沾湿了衣服。但诗人并不在意衣服被打湿，只要能够实现归隐田园的愿望就心满意足。"
+            },
+            {
+                title: "乡村四月",
+                author: "【宋】翁卷",
+                content: [
+                    "绿遍山原白满川，",
+                    "子规声里雨如烟。",
+                    "乡村四月闲人少，",
+                    "才了蚕桑又插田。"
+                ],
+                category: "田园诗系列",
+                explanation: "这首诗描绘了四月乡村的繁忙景象。山野一片翠绿，河川白浪滚滚，杜鹃啼叫中细雨如烟。乡村四月是农忙时节，人们刚刚忙完养蚕采桑的工作，又要开始插秧种田，没有闲人。"
+            },
+            {
+                title: "四时田园杂兴（其三十一）",
+                author: "【宋】范成大",
+                content: [
+                    "昼出耘田夜绩麻，",
+                    "村庄儿女各当家。",
+                    "童孙未解供耕织，",
+                    "也傍桑阴学种瓜。"
+                ],
+                category: "田园诗系列",
+                explanation: "这首诗描述了农村孩子们的劳动生活。白天大人们在田里除草，晚上在家纺麻，村里的孩子们也各自承担家务。年幼的孙子虽然还不能耕田织布，但也在桑树下学着种瓜，从小培养劳动意识。"
+            },
+            {
+                title: "游山西村",
+                author: "【宋】陆游",
+                content: [
+                    "莫笑农家腊酒浑，",
+                    "丰年留客足鸡豚。",
+                    "山重水复疑无路，",
+                    "柳暗花明又一村。",
+                    "箫鼓追随春社近，",
+                    "衣冠简朴古风存。",
+                    "从今若许闲乘月，",
+                    "拄杖无时夜叩门。"
+                ],
+                category: "田园诗系列",
+                explanation: "这首诗描述了诗人游览山西村的所见所感。不要嘲笑农家的酒不清，丰收年景农家留客吃饭有鸡有猪。山路曲折水道弯曲似乎没有出路，但柳树掩映花朵绽放处又出现一个村庄。春社节临近，到处有吹箫打鼓的声音，村民衣着朴素保持着古老风俗。从今以后若有闲暇，我会经常在月夜拄着拐杖来敲门拜访。"
+            },
+            {
+                title: "山中问答",
+                author: "【唐】李白",
+                content: [
+                    "问余何意栖碧山，",
+                    "笑而不答心自闲。",
+                    "桃花流水窅然去，",
+                    "别有天地非人间。"
+                ],
+                category: "田园诗系列",
+                explanation: "这首诗描述了诗人隐居山中的心境。有人问诗人为什么要住在青翠的山中，诗人只是笑而不答，心中自在悠闲。山中桃花流水静静流淌，这里有另一番天地，不同于凡尘俗世。"
+            },
+            {
+                title: "西江月·夜行黄沙道中",
+                author: "【宋】辛弃疾",
+                content: [
+                    "明月别枝惊鹊，",
+                    "清风半夜鸣蝉。",
+                    "稻花香里说丰年，",
+                    "听取蛙声一片。",
+                    "七八个星天外，",
+                    "两三点雨山前。",
+                    "旧时茅店社林边，",
+                    "路转溪桥忽见。"
+                ],
+                category: "田园诗系列",
+                explanation: "这首词描绘了诗人夜行乡间的所见所闻。明月照在树枝上惊动了喜鹊，半夜清风中蝉鸣声声。稻花散发着香气预示着丰收的年景，青蛙此起彼伏地叫着。天边有七八颗星星，山前飘着两三点雨。转过弯，忽然看到了路边的茅草店铺和社树林。"
+            },
+            {
+                title: "渔歌子",
+                author: "【唐】张志和",
+                content: [
+                    "西塞山前白鹭飞，",
+                    "桃花流水鳜鱼肥。",
+                    "青箬笠，",
+                    "绿蓑衣，",
+                    "斜风细雨不须归。"
+                ],
+                category: "田园诗系列",
+                explanation: "这首诗描绘了渔夫悠闲自得的生活。西塞山前白鹭飞翔，桃花盛开的溪水中鳜鱼肥美。渔夫戴着青色的斗笠，穿着绿色的蓑衣，在斜风细雨中垂钓，不必急着回家。"
+            },
+            {
+                title: "卜算子·咏梅",
+                author: "【宋】陆游",
+                content: [
+                    "驿外断桥边，",
+                    "寂寞开无主。",
+                    "已是黄昏独自愁，",
+                    "更著风和雨。",
+                    "无意苦争春，",
+                    "一任群芳妒。",
+                    "零落成泥碾作尘，",
+                    "只有香如故。"
+                ],
+                category: "田园诗系列",
+                explanation: "这首词以梅花自喻，表达了诗人坚贞不屈的品格。驿站外断桥边的梅花寂寞地开放，没有主人照料。黄昏时分，梅花在风雨中显得更加孤独凄凉。梅花不与百花争艳，任凭其他花朵嫉妒。即使零落成泥被碾作尘土，梅花的香气依然如故，象征着诗人的气节永存。"
+            },
+            // 第二部分：古代诗人
+            {
+                title: "屈原诗句选",
+                author: "【战国】屈原",
+                content: [
+                    "路曼曼其修远兮，吾将上下而求索。",
+                    "举世皆浊我独清，众人皆醉我独醒。",
+                    "长太息以掩涕兮，哀民生之多艰。"
+                ],
+                category: "古代诗人",
+                explanation: "这是屈原《离骚》等作品中的名句。第一句表达了诗人不畏艰难、不懈追求的精神；第二句表达了诗人的孤高和坚持真理的勇气；第三句表达了诗人对民生疾苦的深切同情。"
+            },
+            {
+                title: "饮酒其五",
+                author: "【晋】陶渊明",
+                content: [
+                    "结庐在人境，",
+                    "而无车马喧。",
+                    "问君何能尔？",
+                    "心远地自偏。",
+                    "采菊东篱下，",
+                    "悠然见南山。",
+                    "山气日夕佳，",
+                    "飞鸟相与还。",
+                    "此中有真意，",
+                    "欲辨已忘言。"
+                ],
+                category: "古代诗人",
+                explanation: "这首诗表达了陶渊明归隐田园后的闲适生活和超然心境。诗人的居所虽在人世间，却没有车马喧嚣。这是因为心灵远离尘世，居所自然显得偏僻。诗人在东篱下采菊花，悠然自得地望见南山。傍晚山中的气息格外美好，飞鸟也成群结队地归巢。这种闲适生活中蕴含着真谛，想要表达却已经忘记了言语。"
+            },
+            {
+                title: "春望",
+                author: "【唐】杜甫",
+                content: [
+                    "国破山河在，",
+                    "城春草木深。",
+                    "感时花溅泪，",
+                    "恨别鸟惊心。",
+                    "烽火连三月，",
+                    "家书抵万金。",
+                    "白头搔更短，",
+                    "浑欲不胜簪。"
+                ],
+                category: "古代诗人",
+                explanation: "这首诗表达了杜甫对安史之乱后国家破败、家人离散的悲痛。国家虽然破败，山河依然存在。长安城中春天来临，草木茂盛。看到花朵，诗人感时伤怀而落泪；听到鸟叫，诗人因思念亲人而惊心。战火已经连续三个月，家书珍贵如万金。忧愁使诗人白发增多，搔头时头发变得更短，几乎不能用簪子固定了。"
+            },
+            {
+                title: "春夜喜雨",
+                author: "【唐】杜甫",
+                content: [
+                    "好雨知时节，",
+                    "当春乃发生。",
+                    "随风潜入夜，",
+                    "润物细无声。",
+                    "野径云俱黑，",
+                    "江船火独明。",
+                    "晓看红湿处，",
+                    "花重锦官城。"
+                ],
+                category: "古代诗人",
+                explanation: "这首诗描写了春夜及时雨的情景。好雨知道时节，在春天到来时降临。雨随着风在夜里悄然而至，滋润万物却没有声响。乡间小路上云雾弥漫一片漆黑，江上船只的灯火格外明亮。清晨看到被雨水打湿的红花，成都城中的花朵显得更加繁茂。"
+            },
+            {
+                title: "早春呈水部张十八员外",
+                author: "【唐】韩愈",
+                content: [
+                    "天街小雨润如酥，",
+                    "草色遥看近却无。",
+                    "最是一年春好处，",
+                    "绝胜烟柳满皇都。"
+                ],
+                category: "古代诗人",
+                explanation: "这首诗描写了早春时节的景色。京城街道上下着小雨，滋润得像酥油一样细腻。远看草地一片青绿，走近却没有草长出来。春天最美好的时刻，胜过烟雾中柳树遍布的京城景色。"
+            },
+            {
+                title: "韩愈名句",
+                author: "【唐】韩愈",
+                content: [
+                    "人非生而知之者，孰能无惑？",
+                    "业精于勤荒于嬉，行成于思毁于随。",
+                    "书山有路勤为径，学海无涯苦作舟。"
+                ],
+                category: "古代诗人",
+                explanation: "这些是韩愈的名句。第一句表达人不是生来就懂得一切的，谁能没有疑惑；第二句强调学业靠勤奋而荒废于玩乐，品行靠思考而毁于随波逐流；第三句比喻学习如登山涉海，需要勤奋和刻苦作为途径和工具。"
+            },
+            {
+                title: "陋室铭",
+                author: "【唐】刘禹锡",
+                content: [
+                    "山不在高，有仙则名。",
+                    "水不在深，有龙则灵。",
+                    "斯是陋室，惟吾德馨。",
+                    "苔痕上阶绿，草色入帘青。",
+                    "谈笑有鸿儒，往来无白丁。",
+                    "可以调素琴，阅金经。",
+                    "无丝竹之乱耳，无案牍之劳形。",
+                    "南阳诸葛庐，西蜀子云亭。",
+                    "孔子云：何陋之有？"
+                ],
+                category: "古代诗人",
+                explanation: "这篇铭文表达了刘禹锡安贫乐道的思想。山不在高，有仙人就出名；水不在深，有龙就灵验。这虽是简陋的房子，但因我品德高尚而显得美好。台阶上长满绿苔，帘外草色青青。有学识渊博的人来谈笑，没有无知的人来往。可以在这里弹琴读经，没有音乐的喧闹和公文的劳累。这里像诸葛亮的草庐和扬雄的亭子一样，正如孔子所说：有什么简陋的呢？"
+            },
+            {
+                title: "秋词",
+                author: "【唐】刘禹锡",
+                content: [
+                    "自古逢秋悲寂寥，",
+                    "我言秋日胜春朝。",
+                    "晴空一鹤排云上，",
+                    "便引诗情到碧霄。"
+                ],
+                category: "古代诗人",
+                explanation: "这首诗表达了诗人积极乐观的情怀。自古以来人们遇到秋天都感到悲伤寂寞，而我却认为秋天胜过春天。晴朗的天空中一只仙鹤冲破云层高飞，引发我的诗兴直上青天。"
+            },
+            {
+                title: "乌衣巷",
+                author: "【唐】刘禹锡",
+                content: [
+                    "朱雀桥边野草花，",
+                    "乌衣巷口夕阳斜。",
+                    "旧时王谢堂前燕，",
+                    "飞入寻常百姓家。"
+                ],
+                category: "古代诗人",
+                explanation: "这首诗感叹世事变迁、盛衰无常。朱雀桥边长满了野草和花，乌衣巷口夕阳西斜。从前王导和谢安等贵族府邸前的燕子，如今飞入了普通百姓家中，暗示昔日繁华的贵族区已经衰落。"
+            },
+            {
+                title: "酬乐天扬州初逢席上见赠",
+                author: "【唐】刘禹锡",
+                content: [
+                    "巴山楚水凄凉地，",
+                    "二十三年弃置身。",
+                    "怀旧空吟闻笛赋，",
+                    "到乡翻似烂柯人。",
+                    "沉舟侧畔千帆过，",
+                    "病树前头万木春。",
+                    "今日听君歌一曲，",
+                    "暂凭杯酒长精神。"
+                ],
+                category: "古代诗人",
+                explanation: "这首诗表达了诗人历经贬谪后的感慨和乐观精神。巴山楚水是凄凉之地，我被贬谪在此二十三年。怀念旧日只能空自吟诵《闻笛赋》，回到家乡却像烂柯人一样物是人非。沉船旁边有千艘船驶过，病树前面是万木逢春。今天听到你的歌声，暂且借酒杯提振精神。"
+            },
+            {
+                title: "渔家傲·塞下秋来风景异",
+                author: "【宋】范仲淹",
+                content: [
+                    "塞下秋来风景异，",
+                    "衡阳雁去无留意。",
+                    "四面边声连角起。",
+                    "千嶂里，",
+                    "长烟落日孤城闭。",
+                    "浊酒一杯家万里，",
+                    "燕然未勒归无计，",
+                    "羌管悠悠霜满地。",
+                    "人不寐，",
+                    "将军白发征夫泪。"
+                ],
+                category: "古代诗人",
+                explanation: "这首词描写了边塞秋天的景色和将士的思乡之情。边塞秋天的景色与中原不同，南飞的大雁毫不留恋地飞过。四面八方都是边塞的号角声。群山之中，夕阳西下，烟雾弥漫，孤城紧闭。喝一杯浊酒，想到家乡在万里之外。燕然山上还没有刻功德碑，无法回家。羌笛声悠扬，大地上霜气弥漫。将士们夜不能寐，将军白发苍苍，士兵们流下思乡的泪水。"
+            },
+            {
+                title: "岳阳楼记（节选）",
+                author: "【宋】范仲淹",
+                content: [
+                    "不以物喜，不以己悲，",
+                    "居庙堂之高则忧其民，处江湖之远则忧其君。",
+                    "是进亦忧，退亦忧。",
+                    "然则何时而乐耶？",
+                    "其必曰'先天下之忧而忧，后天下之乐而乐'"
+                ],
+                category: "古代诗人",
+                explanation: "这段文字表达了范仲淹的政治抱负和人生态度。不因外物而喜悦，不因个人遭遇而悲伤。在朝廷做官就担忧百姓，在民间生活就担忧国君。无论是做官还是退隐都有忧虑。那么什么时候才会快乐呢？一定是'先于天下人忧虑，后于天下人快乐'。"
+            },
+            {
+                title: "己亥杂诗",
+                author: "【清】龚自珍",
+                content: [
+                    "九州生气恃风雷，",
+                    "万马齐喑究可哀。",
+                    "我劝天公重抖擞，",
+                    "不拘一格降人才。"
+                ],
+                category: "古代诗人",
+                explanation: "这首诗表达了诗人对社会变革的期望。中国的生机需要风雷激发，万马无声确实可悲。我劝上天再次奋起，不拘一格地选拔人才，暗示国家需要各种人才来推动变革。"
+            },
+            // 第三部分：送别诗
+            {
+                title: "黄鹤楼送孟浩然之广陵",
+                author: "【唐】李白",
+                content: [
+                    "故人西辞黄鹤楼，",
+                    "烟花三月下扬州。",
+                    "孤帆远影碧空尽，",
+                    "唯见长江天际流。"
+                ],
+                category: "送别诗",
+                explanation: "这首诗描写了李白在黄鹤楼送别孟浩然的情景。朋友从黄鹤楼向西告别，在烟雾弥漫、繁花似锦的三月前往扬州。孤零零的船帆远去，最后消失在碧蓝的天空中，只看见长江水流向天边。"
+            },
+            {
+                title: "别董大",
+                author: "【唐】高适",
+                content: [
+                    "千里黄云白日曛，",
+                    "北风吹雁雪纷纷。",
+                    "莫愁前路无知己，",
+                    "天下谁人不识君。"
+                ],
+                category: "送别诗",
+                explanation: "这首诗表达了诗人对朋友的勉励和赞美。千里黄云中白日将尽，北风吹着大雁，雪花纷飞。不要担心前路上没有知己，天下谁不认识你这样的贤才呢？"
+            },
+            {
+                title: "送杜少府之任蜀州",
+                author: "【唐】王勃",
+                content: [
+                    "城阙辅三秦，",
+                    "风烟望五津。",
+                    "与君离别意，",
+                    "同是宦游人。",
+                    "海内存知己，",
+                    "天涯若比邻。",
+                    "无为在歧路，",
+                    "儿女共沾巾。"
+                ],
+                category: "送别诗",
+                explanation: "这首诗表达了诗人对朋友的惜别和勉励。长安城墙和宫阙环绕着三秦地区，远望蜀州的五津，烟雾迷蒙。与你分别的心情，我最能理解，因为我们都是在外做官的人。只要海内有知己，即使远在天涯也如近在咫尺。不要在分别的路口，像儿女一样哭湿手帕。"
+            },
+            {
+                title: "送元二使安西",
+                author: "【唐】王维",
+                content: [
+                    "渭城朝雨浥轻尘，",
+                    "客舍青青柳色新。",
+                    "劝君更尽一杯酒，",
+                    "西出阳关无故人。"
+                ],
+                category: "送别诗",
+                explanation: "这首诗描写了诗人送别朋友的情景。渭城早晨的雨水湿润了轻尘，客舍前青青的柳树呈现出新绿。劝你再喝一杯酒，因为向西出了阳关就没有熟人了。"
+            },
+            {
+                title: "送柴侍御",
+                author: "【唐】王昌龄",
+                content: [
+                    "流水通波接武冈，",
+                    "送君不觉有离伤。",
+                    "青山一道同云雨，",
+                    "明月何曾是两乡。"
+                ],
+                category: "送别诗",
+                explanation: "这首诗表达了诗人对朋友的深情和对未来重逢的期望。流水波浪连接着武冈山，送别你时并不感到离别的伤感。青山与云雨相连，明月照耀的不是两个不同的地方。暗示虽然分离，但心灵相通，将来必定重逢。"
+            },
+            {
+                title: "赋得古原草送别",
+                author: "【唐】白居易",
+                content: [
+                    "离离原上草，",
+                    "一岁一枯荣。",
+                    "野火烧不尽，",
+                    "春风吹又生。",
+                    "远芳侵古道，",
+                    "晴翠接荒城。",
+                    "又送王孙去，",
+                    "萋萋满别情。"
+                ],
+                category: "送别诗",
+                explanation: "这首诗以原上的野草比喻坚韧不屈的生命力，表达了送别友人的情感。原野上的草茂密繁盛，一年一度枯萎又茂盛。野火烧不尽它们，春风一吹又重新生长。草的香气远远地飘到古道上，晴天里翠绿的草连接着荒凉的城墙。又送别贵族子弟，茂密的野草充满了离别的情意。"
+            },
+            {
+                title: "送友人",
+                author: "【唐】李白",
+                content: [
+                    "青山横北郭，",
+                    "白水绕东城。",
+                    "此地一为别，",
+                    "孤蓬万里征。",
+                    "浮云游子意，",
+                    "落日故人情。",
+                    "挥手自兹去，",
+                    "萧萧班马鸣。"
+                ],
+                category: "送别诗",
+                explanation: "这首诗描写了诗人送别朋友的情景和感受。青山横亘在北郊，白水环绕着东城。在这里与你分别，你将像孤蓬一样远行万里。浮云象征游子的心情，落日象征故人的情谊。从此挥手告别，只听见马蹄声萧萧远去。"
+            },
+            {
+                title: "重送裴郎中贬吉州",
+                author: "【唐】刘长卿",
+                content: [
+                    "猿啼客散暮江头，",
+                    "人自伤心水自流。",
+                    "同作逐臣君更远，",
+                    "青山万里一孤舟。"
+                ],
+                category: "送别诗",
+                explanation: "这首诗表达了诗人对朋友的思念和对远方的祝愿。猿啼客散在暮江头，人自伤心地看水自流。同作逐臣的你，远在千里之外。青山万里，一孤舟，与你同去。"
+            },
+            // 第四部分：托物言志诗
+            {
+                title: "白梅",
+                author: "【元】王冕",
+                content: [
+                    "冰雪林中著此身，",
+                    "不同桃李混芳尘。",
+                    "忽然一夜清香发，",
+                    "散作乾坤万里春。"
+                ],
+                category: "托物言志诗",
+                explanation: "这首诗赞美了梅花的高洁品格。这是一片冰雪林中的梅花，每朵都散发着淡淡的清香。诗人以梅花自喻，表达了自己不求名利，只求留下清白品格的志向。"
+            },
+            {
+                title: "竹石",
+                author: "【清】郑燮",
+                content: [
+                    "咬定青山不放松，",
+                    "立根原在破岩中。",
+                    "千磨万击还坚劲，",
+                    "任尔东西南北风。"
+                ],
+                category: "托物言志诗",
+                explanation: "这首诗赞美了竹子顽强不屈的精神。竹子紧紧依附青山不松开，它的根扎在破裂的岩石中。经历千磨万击仍然坚韧挺拔，任凭你东西南北风吹打。诗人借竹子表达了自己坚定不移的志向和不畏艰难的精神。"
+            },
+            {
+                title: "菊花",
+                author: "【唐】元稹",
+                content: [
+                    "秋丛绕舍似陶家，",
+                    "遍绕篱边日渐斜。",
+                    "不是花中偏爱菊，",
+                    "此花开尽更无花。"
+                ],
+                category: "托物言志诗",
+                explanation: "这首诗赞美了菊花的高洁品格。秋丛绕舍像陶家，篱笆边的竹子逐渐斜斜地生长。不是花中偏爱菊花，这朵菊花已经开尽了。诗人借菊花表达了自己对自然的热爱和对生命的追求。"
+            },
+            {
+                title: "梅花",
+                author: "【宋】王安石",
+                content: [
+                    "墙角数枝梅，",
+                    "凌寒独自开。",
+                    "遥知不是雪，",
+                    "为有暗香来。"
+                ],
+                category: "托物言志诗",
+                explanation: "这首诗赞美了梅花不畏严寒的品格。墙角有几枝梅花，在寒冷中独自绽放。远远就知道那不是雪，因为有淡淡的香气飘来。诗人借梅花表达了自己不畏艰难、坚持操守的精神。"
+            },
+            {
+                title: "题菊花",
+                author: "【唐】黄巢",
+                content: [
+                    "飒飒西风满院栽,",
+                    "蕊寒香冷蝶难来。",
+                    "他年我若为青帝，",
+                    "报与桃花一处开。"
+                ],
+                category: "托物言志诗",
+                explanation: "这首诗赞美了菊花的高洁品格。秋风飒飒地吹满院，菊花的花瓣在寒冷中飘落。他年我若为青帝，他的诗与桃花一处开。诗人借菊花表达了自己对自然的热爱和对生命的追求。"
+            }
+        ];
+           
+        // 游戏状态
+        const gameState = {
+            currentPoem: null,
+            score: 0,
+            mode: 'recite',
+            gameMode: 'normal',
+            hiddenWords: [],
+            timer: 60,
+            timerInterval: null,
+            learnedPoems: new Set(),
+            currentStreak: 0,
+            stars: 0
+        };
+        
+        // 学生名单
+        const students = [
+            "张明", "李华", "王芳", "赵强", "刘洋", 
+        ];
+        
+        // 初始化游戏
+        function initGame() {
+            // 显示学生名单
+            const studentList = document.getElementById('student-list');
+            studentList.innerHTML = '';
+            students.forEach(student => {
+                const studentItem = document.createElement('div');
+                studentItem.className = 'student-item';
+                studentItem.textContent = student;
+                studentList.appendChild(studentItem);
+            });
+            
+            // 初始化事件监听
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    gameState.mode = this.getAttribute('data-mode');
+                    updateGameMode();
+                });
+            });
+            
+            document.querySelectorAll('.game-mode-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.game-mode-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    gameState.gameMode = this.getAttribute('data-game');
+                    updateGameMode();
+                });
+            });
+            
+            document.getElementById('category-select').addEventListener('change', function() {
+                loadRandomPoem();
+            });
+            
+            document.getElementById('reveal-btn').addEventListener('click', revealPoem);
+            document.getElementById('hide-btn').addEventListener('click', hidePoem);
+            document.getElementById('random-hide-btn').addEventListener('click', randomHideWords);
+            document.getElementById('next-btn').addEventListener('click', loadRandomPoem);
+            document.getElementById('show-explanation-btn').addEventListener('click', toggleExplanation);
+            document.getElementById('check-answer-btn').addEventListener('click', checkAnswers);
+            document.getElementById('pick-student-btn').addEventListener('click', pickRandomStudent);
+            
+            // 加载第一首诗
+            loadRandomPoem();
+            
+            // 更新进度条
+            updateProgress();
+        }
+        
+        // 加载随机诗词
+        function loadRandomPoem() {
+            // 清除计时器
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
+            
+            // 重置计时器
+            gameState.timer = 60;
+            document.getElementById('timer').textContent = gameState.timer;
+            
+            // 获取当前分类
+            const category = document.getElementById('category-select').value;
+            
+            // 根据分类筛选诗词
+            let filteredPoems = poems;
+            if (category !== 'all') {
+                filteredPoems = poems.filter(poem => poem.category === category);
+            }
+            
+            // 随机选择一首诗
+            const randomIndex = Math.floor(Math.random() * filteredPoems.length);
+            gameState.currentPoem = filteredPoems[randomIndex];
+            
+            // 更新UI
+            document.getElementById('poem-title').textContent = gameState.currentPoem.title;
+            document.getElementById('poem-author').textContent = gameState.currentPoem.author;
+            
+            // 根据模式显示诗词内容
+            if (gameState.mode === 'fill-blank') {
+                renderFillBlankMode();
+            } else {
+                renderPoemContent();
+            }
+            
+            // 隐藏释义
+            document.getElementById('poem-explanation').style.display = 'none';
+            document.getElementById('poem-explanation').textContent = gameState.currentPoem.explanation;
+            
+            // 更新记忆提示
+            if (gameState.gameMode === 'memory-master') {
+                document.getElementById('memory-mode').style.display = 'block';
+                document.getElementById('memory-tip-content').textContent = generateMemoryTip();
+            } else {
+                document.getElementById('memory-mode').style.display = 'none';
+            }
+            
+            // 如果是限时挑战模式，启动计时器
+            if (gameState.gameMode === 'time-challenge') {
+                startTimer();
+            }
+            
+            // 记录已学习的诗词
+            gameState.learnedPoems.add(gameState.currentPoem.title);
+            
+            // 更新进度
+            updateProgress();
+        }
+        
+        // 渲染诗词内容
+        function renderPoemContent() {
+            const poemContent = document.getElementById('poem-content');
+            poemContent.innerHTML = '';
+            document.getElementById('fill-blank-container').style.display = 'none';
+            poemContent.style.display = 'block';
+            
+            gameState.currentPoem.content.forEach(line => {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'poem-line';
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '，' || char === '。' || char === '？' || char === '！' || char === '、' || char === '；') {
+                        lineDiv.appendChild(document.createTextNode(char));
+                    } else {
+                        const wordSpan = document.createElement('span');
+                        wordSpan.className = 'word revealed';
+                        const charSpan = document.createElement('span');
+                        charSpan.textContent = char;
+                        wordSpan.appendChild(charSpan);
+                        lineDiv.appendChild(wordSpan);
+                    }
+                }
+                
+                poemContent.appendChild(lineDiv);
+            });
+            
+            // 如果是挑战模式，随机隐藏一些字
+            if (gameState.mode === 'challenge') {
+                randomHideWords();
+            }
+            
+            // 显示检查答案按钮
+            document.getElementById('check-answer-btn').style.display = gameState.mode === 'challenge' ? 'block' : 'none';
+        }
+        
+        // 渲染填空模式
+        function renderFillBlankMode() {
+            const fillBlankContainer = document.getElementById('fill-blank-container');
+            fillBlankContainer.innerHTML = '';
+            document.getElementById('poem-content').style.display = 'none';
+            fillBlankContainer.style.display = 'block';
+            
+            gameState.currentPoem.content.forEach(line => {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'fill-blank-line';
+                
+                const words = line.split('');
+                let lineHTML = '';
+                
+                for (let i = 0; i < words.length; i++) {
+                    const char = words[i];
+                    if (char === '，' || char === '。' || char === '？' || char === '！' || char === '、' || char === '；') {
+                        lineHTML += `<span class="fill-blank-word">${char}</span>`;
+                    } else {
+                        // 随机决定是否为填空
+                        if (Math.random() < 0.3) {
+                            lineHTML += `<input type="text" class="fill-blank-input" data-correct="${char}">`;
+                        } else {
+                            lineHTML += `<span class="fill-blank-word">${char}</span>`;
+                        }
+                    }
+                }
+                
+                lineDiv.innerHTML = lineHTML;
+                fillBlankContainer.appendChild(lineDiv);
+            });
+            
+            // 显示检查答案按钮
+            document.getElementById('check-answer-btn').style.display = 'block';
+        }
+        
+        // 显示全诗
+        function revealPoem() {
+            document.querySelectorAll('.word').forEach(word => {
+                word.classList.remove('hidden');
+                word.classList.add('revealed');
+            });
+        }
+        
+        // 隐藏全诗
+        function hidePoem() {
+            document.querySelectorAll('.word').forEach(word => {
+                word.classList.remove('revealed');
+                word.classList.add('hidden');
+            });
+        }
+        
+        // 随机隐藏字词
+        function randomHideWords() {
+            gameState.hiddenWords = [];
+            document.querySelectorAll('.word').forEach(word => {
+                if (Math.random() < 0.5) {
+                    word.classList.remove('revealed');
+                    word.classList.add('hidden');
+                    gameState.hiddenWords.push(word);
+                } else {
+                    word.classList.remove('hidden');
+                    word.classList.add('revealed');
+                }
+            });
+        }
+        
+        // 切换显示释义
+        function toggleExplanation() {
+            const explanationDiv = document.getElementById('poem-explanation');
+            if (explanationDiv.style.display === 'none') {
+                explanationDiv.style.display = 'block';
+                document.getElementById('show-explanation-btn').textContent = '隐藏释义';
+            } else {
+                explanationDiv.style.display = 'none';
+                document.getElementById('show-explanation-btn').textContent = '显示释义';
+            }
+        }
+        
+        // 检查答案
+        function checkAnswers() {
+            let correctCount = 0;
+            let totalCount = 0;
+            
+            if (gameState.mode === 'challenge') {
+                gameState.hiddenWords.forEach(word => {
+                    totalCount++;
+                    const userInput = prompt(`请输入隐藏的字: ${word.previousSibling?.textContent || ''} ? ${word.nextSibling?.textContent || ''}`);
+                    const correctChar = word.querySelector('span').textContent;
+                    
+                    if (userInput === correctChar) {
+                        word.classList.remove('hidden');
+                        word.classList.add('revealed', 'correct');
+                        correctCount++;
+                    } else {
+                        word.classList.remove('hidden');
+                        word.classList.add('revealed', 'incorrect');
+                    }
+                });
+            } else if (gameState.mode === 'fill-blank') {
+                const inputs = document.querySelectorAll('.fill-blank-input');
+                totalCount = inputs.length;
+                
+                inputs.forEach(input => {
+                    const userInput = input.value.trim();
+                    const correctChar = input.getAttribute('data-correct');
+                    
+                    if (userInput === correctChar) {
+                        input.style.color = '#00b894';
+                        input.style.borderColor = '#00b894';
+                        correctCount++;
+                    } else {
+                        input.style.color = '#d63031';
+                        input.style.borderColor = '#d63031';
+                        input.value = correctChar;
+                    }
+                    
+                    input.disabled = true;
+                });
+            }
+            
+            // 计算得分
+            const score = Math.round((correctCount / totalCount) * 100);
+            gameState.score += score;
+            
+            // 更新连续正确次数
+            if (correctCount === totalCount) {
+                gameState.currentStreak++;
+                // 每连续答对3次，获得一颗星
+                if (gameState.currentStreak % 3 === 0) {
+                    gameState.stars = Math.min(5, gameState.stars + 1);
+                    updateStars();
+                    showCelebration();
+                }
+            } else {
+                gameState.currentStreak = 0;
+            }
+            
+            // 更新得分显示
+            document.getElementById('score-display').textContent = `得分: ${gameState.score}`;
+            document.getElementById('current-streak').textContent = `连续正确: ${gameState.currentStreak}`;
+            
+            // 显示结果提示
+            const hintContainer = document.getElementById('hint-container');
+            hintContainer.innerHTML = `<div class="hint-box">你答对了 ${correctCount}/${totalCount} 个字，得分 +${score}！</div>`;
+            
+            // 禁用检查按钮
+            document.getElementById('check-answer-btn').disabled = true;
+            
+            // 3秒后重置
+            setTimeout(() => {
+                document.getElementById('check-answer-btn').disabled = false;
+                hintContainer.innerHTML = '';
+            }, 3000);
+        }
+        
+        // 更新星星显示
+        function updateStars() {
+            const starsContainer = document.getElementById('stars-container');
+            const stars = starsContainer.querySelectorAll('.star');
+            
+            for (let i = 0; i < stars.length; i++) {
+                if (i < gameState.stars) {
+                    stars[i].classList.add('earned');
+                } else {
+                    stars[i].classList.remove('earned');
+                }
+            }
+        }
+        
+        // 显示庆祝动画
+        function showCelebration() {
+            const celebration = document.getElementById('celebration');
+            celebration.style.display = 'block';
+            celebration.innerHTML = '';
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                celebration.appendChild(confetti);
+            }
+            
+            setTimeout(() => {
+                celebration.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 随机抽选学生
+        function pickRandomStudent() {
+            const studentItems = document.querySelectorAll('.student-item');
+            
+            // 先清除之前的选中状态
+            studentItems.forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // 随机选择一个学生
+            const randomIndex = Math.floor(Math.random() * studentItems.length);
+            studentItems[randomIndex].classList.add('selected');
+            
+            // 滚动到选中的学生
+            studentItems[randomIndex].scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+        
+        // 生成记忆提示
+        function generateMemoryTip() {
+            const poem = gameState.currentPoem;
+            let tip = '';
+            
+            // 根据诗的类型生成不同的提示
+            switch (poem.category) {
+                case '田园诗系列':
+                    tip = '提示：这是一首描写田园生活的诗，可以想象诗中的自然景色和农村生活场景。';
+                    break;
+                case '古代诗人':
+                    tip = `提示：这是${poem.author}的作品，可以回忆这位诗人的风格特点。`;
+                    break;
+                case '送别诗':
+                    tip = '提示：这是一首送别诗，可以想象送别的场景和情感。';
+                    break;
+                case '托物言志诗':
+                    tip = '提示：这首诗借物抒情，表达了诗人的志向和品格。';
+                    break;
+                default:
+                    tip = '提示：尝试记住每句的第一个字和最后一个字，然后填补中间的内容。';
+            }
+            
+            return tip;
+        }
+        
+        // 启动计时器
+        function startTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            gameState.timer = 60;
+            document.getElementById('timer').textContent = gameState.timer;
+            
+            gameState.timerInterval = setInterval(() => {
+                gameState.timer--;
+                document.getElementById('timer').textContent = gameState.timer;
+                
+                if (gameState.timer <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    alert('时间到！');
+                    
+                    // 如果是挑战模式，自动检查答案
+                    if (gameState.mode === 'challenge' || gameState.mode === 'fill-blank') {
+                        checkAnswers();
+                    }
+                }
+            }, 1000);
+        }
+        
+        // 更新游戏模式
+        function updateGameMode() {
+            // 重新加载诗词以适应新模式
+            loadRandomPoem();
+            
+            // 更新UI元素
+            if (gameState.mode === 'fill-blank') {
+                document.getElementById('reveal-btn').style.display = 'none';
+                document.getElementById('hide-btn').style.display = 'none';
+                document.getElementById('random-hide-btn').style.display = 'none';
+            } else {
+                document.getElementById('reveal-btn').style.display = 'block';
+                document.getElementById('hide-btn').style.display = 'block';
+                document.getElementById('random-hide-btn').style.display = 'block';
+            }
+        }
+        
+        // 更新进度
+        function updateProgress() {
+            const totalPoems = poems.length;
+            const learnedCount = gameState.learnedPoems.size;
+            
+            document.getElementById('poems-learned').textContent = `已学习: ${learnedCount}/${totalPoems}`;
+            
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${(learnedCount / totalPoems) * 100}%`;
+        }
+        
+        // 页面加载完成后初始化游戏
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>

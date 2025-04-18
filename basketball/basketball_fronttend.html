@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>篮球比赛数据展示</title>
+    <link href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.org/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1546519638-68e109fd3a4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .card {
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .dark-mode .card {
+            background-color: #2d2d2d;
+        }
+        .scoreboard {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        .live-badge {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-basketball-ball text-2xl text-blue-600 mr-2"></i>
+                    <span class="text-xl font-bold">篮球数据</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="darkModeToggle" class="p-2 rounded-lg bg-gray-200 hover:bg-gray-300">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="p-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero区域 -->
+    <div class="hero text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h1 class="text-5xl font-bold mb-4">NBA 2023-2024赛季</h1>
+            <p class="text-xl mb-8">实时数据统计与比赛追踪</p>
+            <div class="flex justify-center space-x-4">
+                <button class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
+                    查看赛程
+                </button>
+                <button class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">
+                    数据排行
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 实时比分板 -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h2 class="text-2xl font-bold mb-4">实时比分</h2>
+        <div class="scoreboard rounded-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div class="text-center">
+                    <img src="https://cdn.nba.com/logos/nba/lakers/primary/L/logo.svg" alt="湖人队" class="h-16 mx-auto mb-2">
+                    <h3 class="text-xl font-bold">湖人队</h3>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold">120</div>
+                    <div class="text-sm">第三节 8:45</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold">115</div>
+                    <div class="text-sm">第三节 8:45</div>
+                </div>
+                <div class="text-center">
+                    <img src="https://cdn.nba.com/logos/nba/warriors/primary/W/logo.svg" alt="勇士队" class="h-16 mx-auto mb-2">
+                    <h3 class="text-xl font-bold">勇士队</h3>
+                </div>
+            </div>
+            <div class="flex justify-center">
+                <span class="live-badge bg-red-500 text-white px-3 py-1 rounded-full text-sm">
+                    <i class="fas fa-circle mr-1"></i>直播中
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据统计 -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h2 class="text-2xl font-bold mb-4">数据统计</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="card bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">得分榜</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">1</span>
+                            <span>勒布朗·詹姆斯</span>
+                        </div>
+                        <span class="font-bold">25.0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">2</span>
+                            <span>斯蒂芬·库里</span>
+                        </div>
+                        <span class="font-bold">24.5</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">3</span>
+                            <span>凯文·杜兰特</span>
+                        </div>
+                        <span class="font-bold">24.0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">篮板榜</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">1</span>
+                            <span>安东尼·戴维斯</span>
+                        </div>
+                        <span class="font-bold">12.5</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">2</span>
+                            <span>尼古拉·约基奇</span>
+                        </div>
+                        <span class="font-bold">11.8</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">3</span>
+                            <span>乔尔·恩比德</span>
+                        </div>
+                        <span class="font-bold">11.5</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">助攻榜</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">1</span>
+                            <span>克里斯·保罗</span>
+                        </div>
+                        <span class="font-bold">10.2</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">2</span>
+                            <span>詹姆斯·哈登</span>
+                        </div>
+                        <span class="font-bold">9.8</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">3</span>
+                            <span>卢卡·东契奇</span>
+                        </div>
+                        <span class="font-bold">9.5</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">抢断榜</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">1</span>
+                            <span>吉米·巴特勒</span>
+                        </div>
+                        <span class="font-bold">2.1</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">2</span>
+                            <span>克里斯·保罗</span>
+                        </div>
+                        <span class="font-bold">1.9</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 mr-2">3</span>
+                            <span>弗雷德·范弗利特</span>
+                        </div>
+                        <span class="font-bold">1.8</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 赛程表 -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h2 class="text-2xl font-bold mb-4">近期赛程</h2>
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <table class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">时间</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">主队</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">客队</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">2024-03-20</td>
+                        <td class="px-6 py-4 whitespace-nowrap">19:30</td>
+                        <td class="px-6 py-4 whitespace-nowrap">湖人队</td>
+                        <td class="px-6 py-4 whitespace-nowrap">勇士队</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                进行中
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">2024-03-21</td>
+                        <td class="px-6 py-4 whitespace-nowrap">20:00</td>
+                        <td class="px-6 py-4 whitespace-nowrap">凯尔特人队</td>
+                        <td class="px-6 py-4 whitespace-nowrap">篮网队</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                未开始
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-sm">© 2024 篮球数据统计系统</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 深色模式切换
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const icon = darkModeToggle.querySelector('i');
+            if (body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+
+        // 检查系统主题设置
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            body.classList.add('dark-mode');
+            darkModeToggle.querySelector('i').classList.remove('fa-moon');
+            darkModeToggle.querySelector('i').classList.add('fa-sun');
+        }
+    </script>
+</body>
+</html>

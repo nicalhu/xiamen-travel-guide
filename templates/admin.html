@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天骄世家篮球数据统计 - 管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+    <!-- Sidebar -->
+    <aside class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 shadow-lg">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">管理后台</h1>
+        </div>
+        <nav class="mt-6">
+            <a href="#teams" class="flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fas fa-users mr-3"></i>
+                球队管理
+            </a>
+            <a href="#matches" class="flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fas fa-basketball-ball mr-3"></i>
+                比赛管理
+            </a>
+            <a href="#players" class="flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fas fa-user mr-3"></i>
+                球员管理
+            </a>
+            <a href="#stats" class="flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fas fa-chart-bar mr-3"></i>
+                数据统计
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 p-8">
+        <!-- Teams Section -->
+        <section id="teams" class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">球队管理</h2>
+                <button onclick="showAddTeamModal()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    添加球队
+                </button>
+            </div>
+            <div id="teamsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Teams will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Matches Section -->
+        <section id="matches" class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">比赛管理</h2>
+                <button onclick="showAddMatchModal()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    添加比赛
+                </button>
+            </div>
+            <div id="matchesContainer" class="space-y-4">
+                <!-- Matches will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Players Section -->
+        <section id="players" class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">球员管理</h2>
+                <button onclick="showAddPlayerModal()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    添加球员
+                </button>
+            </div>
+            <div id="playersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Players will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Statistics Section -->
+        <section id="stats" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">数据统计</h2>
+            <div id="statsContainer" class="space-y-6">
+                <!-- Statistics will be loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Add Team Modal -->
+    <div id="addTeamModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-96 mx-auto mt-20">
+            <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">添加球队</h3>
+            <form id="addTeamForm" onsubmit="handleAddTeam(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">球队名称</label>
+                    <input type="text" name="name" required class="w-full px-3 py-2 border rounded">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="closeAddTeamModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                        取消
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        添加
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Match Modal -->
+    <div id="addMatchModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-96 mx-auto mt-20">
+            <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">添加比赛</h3>
+            <form id="addMatchForm" onsubmit="handleAddMatch(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">主队</label>
+                    <select name="homeTeam" required class="w-full px-3 py-2 border rounded">
+                        <!-- Teams will be loaded here -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">客队</label>
+                    <select name="awayTeam" required class="w-full px-3 py-2 border rounded">
+                        <!-- Teams will be loaded here -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">比赛时间</label>
+                    <input type="datetime-local" name="date" required class="w-full px-3 py-2 border rounded">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">直播链接</label>
+                    <input type="url" name="streamUrl" class="w-full px-3 py-2 border rounded">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="closeAddMatchModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                        取消
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        添加
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Player Modal -->
+    <div id="addPlayerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-96 mx-auto mt-20">
+            <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">添加球员</h3>
+            <form id="addPlayerForm" onsubmit="handleAddPlayer(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">姓名</label>
+                    <input type="text" name="name" required class="w-full px-3 py-2 border rounded">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">球队</label>
+                    <select name="team" required class="w-full px-3 py-2 border rounded">
+                        <!-- Teams will be loaded here -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">号码</label>
+                    <input type="number" name="number" required class="w-full px-3 py-2 border rounded">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="closeAddPlayerModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                        取消
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        添加
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let teams = JSON.parse(localStorage.getItem('teams')) || [];
+        let matches = JSON.parse(localStorage.getItem('matches')) || [];
+        let players = JSON.parse(localStorage.getItem('players')) || [];
+
+        // Modal Functions
+        function showAddTeamModal() {
+            document.getElementById('addTeamModal').classList.remove('hidden');
+        }
+
+        function closeAddTeamModal() {
+            document.getElementById('addTeamModal').classList.add('hidden');
+            document.getElementById('addTeamForm').reset();
+        }
+
+        function showAddMatchModal() {
+            const homeTeamSelect = document.querySelector('#addMatchForm select[name="homeTeam"]');
+            const awayTeamSelect = document.querySelector('#addMatchForm select[name="awayTeam"]');
+            homeTeamSelect.innerHTML = '';
+            awayTeamSelect.innerHTML = '';
+            teams.forEach(team => {
+                homeTeamSelect.innerHTML += `<option value="${team.id}">${team.name}</option>`;
+                awayTeamSelect.innerHTML += `<option value="${team.id}">${team.name}</option>`;
+            });
+            document.getElementById('addMatchModal').classList.remove('hidden');
+        }
+
+        function closeAddMatchModal() {
+            document.getElementById('addMatchModal').classList.add('hidden');
+            document.getElementById('addMatchForm').reset();
+        }
+
+        function showAddPlayerModal() {
+            const teamSelect = document.querySelector('#addPlayerForm select[name="team"]');
+            teamSelect.innerHTML = '';
+            teams.forEach(team => {
+                teamSelect.innerHTML += `<option value="${team.id}">${team.name}</option>`;
+            });
+            document.getElementById('addPlayerModal').classList.remove('hidden');
+        }
+
+        function closeAddPlayerModal() {
+            document.getElementById('addPlayerModal').classList.add('hidden');
+            document.getElementById('addPlayerForm').reset();
+        }
+
+        // Data Management Functions
+        function handleAddTeam(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const team = {
+                id: Date.now().toString(),
+                name: formData.get('name'),
+                totalPoints: 0,
+                totalFouls: 0,
+                wins: 0,
+                losses: 0
+            };
+            teams.push(team);
+            localStorage.setItem('teams', JSON.stringify(teams));
+            loadTeams();
+            closeAddTeamModal();
+        }
+
+        function handleAddMatch(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const match = {
+                id: Date.now().toString(),
+                homeTeam: formData.get('homeTeam'),
+                awayTeam: formData.get('awayTeam'),
+                date: formData.get('date'),
+                streamUrl: formData.get('streamUrl'),
+                status: 'not_started',
+                homeScore: 0,
+                awayScore: 0,
+                homeFouls: 0,
+                awayFouls: 0
+            };
+            matches.push(match);
+            localStorage.setItem('matches', JSON.stringify(matches));
+            loadMatches();
+            closeAddMatchModal();
+        }
+
+        function handleAddPlayer(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const player = {
+                id: Date.now().toString(),
+                name: formData.get('name'),
+                team: formData.get('team'),
+                number: formData.get('number'),
+                points: 0,
+                rebounds: 0,
+                assists: 0,
+                steals: 0
+            };
+            players.push(player);
+            localStorage.setItem('players', JSON.stringify(players));
+            loadPlayers();
+            closeAddPlayerModal();
+        }
+
+        function updateMatchStatus(matchId, status) {
+            const match = matches.find(m => m.id === matchId);
+            if (match) {
+                match.status = status;
+                localStorage.setItem('matches', JSON.stringify(matches));
+                loadMatches();
+            }
+        }
+
+        function updateMatchScore(matchId, homeScore, awayScore) {
+            const match = matches.find(m => m.id === matchId);
+            if (match) {
+                match.homeScore = parseInt(homeScore);
+                match.awayScore = parseInt(awayScore);
+                localStorage.setItem('matches', JSON.stringify(matches));
+                loadMatches();
+                loadTeamStats();
+            }
+        }
+
+        function updateMatchFouls(matchId, homeFouls, awayFouls) {
+            const match = matches.find(m => m.id === matchId);
+            if (match) {
+                match.homeFouls = parseInt(homeFouls);
+                match.awayFouls = parseInt(awayFouls);
+                localStorage.setItem('matches', JSON.stringify(matches));
+                loadMatches();
+                loadTeamStats();
+            }
+        }
+
+        // Load Data Functions
+        function loadTeams() {
+            const container = document.getElementById('teamsContainer');
+            container.innerHTML = '';
+            teams.forEach(team => {
+                container.innerHTML += `
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">${team.name}</h3>
+                        <button onclick="deleteTeam('${team.id}')" class="text-red-500 hover:text-red-600">
+                            <i class="fas fa-trash"></i> 删除
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function loadMatches() {
+            const container = document.getElementById('matchesContainer');
+            container.innerHTML = '';
+            matches.forEach(match => {
+                const homeTeam = teams.find(t => t.id === match.homeTeam);
+                const awayTeam = teams.find(t => t.id === match.awayTeam);
+                if (homeTeam && awayTeam) {
+                    container.innerHTML += `
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold text-gray-800 dark:text-white">
+                                    ${homeTeam.name} vs ${awayTeam.name}
+                                </h3>
+                                <div class="space-x-2">
+                                    <select onchange="updateMatchStatus('${match.id}', this.value)" class="px-2 py-1 border rounded">
+                                        <option value="not_started" ${match.status === 'not_started' ? 'selected' : ''}>未开始</option>
+                                        <option value="ongoing" ${match.status === 'ongoing' ? 'selected' : ''}>进行中</option>
+                                        <option value="finished" ${match.status === 'finished' ? 'selected' : ''}>已结束</option>
+                                    </select>
+                                    <button onclick="deleteMatch('${match.id}')" class="text-red-500 hover:text-red-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm text-gray-600 dark:text-gray-400">主队得分</label>
+                                    <input type="number" value="${match.homeScore}" 
+                                           onchange="updateMatchScore('${match.id}', this.value, ${match.awayScore})"
+                                           class="w-full px-3 py-2 border rounded">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 dark:text-gray-400">客队得分</label>
+                                    <input type="number" value="${match.awayScore}"
+                                           onchange="updateMatchScore('${match.id}', ${match.homeScore}, this.value)"
+                                           class="w-full px-3 py-2 border rounded">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 dark:text-gray-400">主队犯规</label>
+                                    <input type="number" value="${match.homeFouls}"
+                                           onchange="updateMatchFouls('${match.id}', this.value, ${match.awayFouls})"
+                                           class="w-full px-3 py-2 border rounded">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 dark:text-gray-400">客队犯规</label>
+                                    <input type="number" value="${match.awayFouls}"
+                                           onchange="updateMatchFouls('${match.id}', ${match.homeFouls}, this.value)"
+                                           class="w-full px-3 py-2 border rounded">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 dark:text-gray-400">直播链接</label>
+                                <input type="url" value="${match.streamUrl || ''}"
+                                       onchange="updateStreamUrl('${match.id}', this.value)"
+                                       class="w-full px-3 py-2 border rounded">
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function loadPlayers() {
+            const container = document.getElementById('playersContainer');
+            container.innerHTML = '';
+            players.forEach(player => {
+                const team = teams.find(t => t.id === player.team);
+                if (team) {
+                    container.innerHTML += `
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold text-gray-800 dark:text-white">
+                                    ${player.name} #${player.number}
+                                </h3>
+                                <button onclick="deletePlayer('${player.id}')" class="text-red-500 hover:text-red-600">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400 mb-4">球队: ${team.name}</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-gray-600 dark:text-gray-400">得分</label>
+                                    <input type="number" value="${player.points}"
+                                           onchange="updatePlayerStats('${player.id}', 'points', this.value)"
+                                           class="w-full px-3 py-2 border rounded">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 dark:text-gray-400">篮板</label>
+                                    <input type="number" value="${player.rebounds}"
+                                           onchange="updatePlayerStats('${player.id}', 'rebounds', this.value)"
+                                           class="w-full px-3 py-2 border rounded">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 dark:text-gray-400">助攻</label>
+                                    <input type="number" value="${player.assists}"
+                                           onchange="updatePlayerStats('${player.id}', 'assists', this.value)"
+                                           class="w-full px-3 py-2 border rounded">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 dark:text-gray-400">抢断</label>
+                                    <input type="number" value="${player.steals}"
+                                           onchange="updatePlayerStats('${player.id}', 'steals', this.value)"
+                                           class="w-full px-3 py-2 border rounded">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function loadTeamStats() {
+            const container = document.getElementById('statsContainer');
+            container.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">球队统计</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <th class="px-6 py-3 text-left text-gray-800 dark:text-white">球队</th>
+                                    <th class="px-6 py-3 text-left text-gray-800 dark:text-white">总得分</th>
+                                    <th class="px-6 py-3 text-left text-gray-800 dark:text-white">总犯规</th>
+                                    <th class="px-6 py-3 text-left text-gray-800 dark:text-white">胜</th>
+                                    <th class="px-6 py-3 text-left text-gray-800 dark:text-white">负</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${teams.map(team => {
+                                    const stats = calculateTeamStats(team.id);
+                                    return `
+                                        <tr class="border-t">
+                                            <td class="px-6 py-4 text-gray-800 dark:text-white">${team.name}</td>
+                                            <td class="px-6 py-4 text-gray-800 dark:text-white">${stats.totalPoints}</td>
+                                            <td class="px-6 py-4 text-gray-800 dark:text-white">${stats.totalFouls}</td>
+                                            <td class="px-6 py-4 text-gray-800 dark:text-white">${stats.wins}</td>
+                                            <td class="px-6 py-4 text-gray-800 dark:text-white">${stats.losses}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateTeamStats(teamId) {
+            const teamMatches = matches.filter(m => 
+                (m.homeTeam === teamId || m.awayTeam === teamId) && m.status === 'finished'
+            );
+            
+            let stats = {
+                totalPoints: 0,
+                totalFouls: 0,
+                wins: 0,
+                losses: 0
+            };
+
+            teamMatches.forEach(match => {
+                if (match.homeTeam === teamId) {
+                    stats.totalPoints += match.homeScore;
+                    stats.totalFouls += match.homeFouls;
+                    if (match.homeScore > match.awayScore) stats.wins++;
+                    else stats.losses++;
+                } else {
+                    stats.totalPoints += match.awayScore;
+                    stats.totalFouls += match.awayFouls;
+                    if (match.awayScore > match.homeScore) stats.wins++;
+                    else stats.losses++;
+                }
+            });
+
+            return stats;
+        }
+
+        // Delete Functions
+        function deleteTeam(teamId) {
+            if (confirm('确定要删除这个球队吗？')) {
+                teams = teams.filter(t => t.id !== teamId);
+                localStorage.setItem('teams', JSON.stringify(teams));
+                loadTeams();
+            }
+        }
+
+        function deleteMatch(matchId) {
+            if (confirm('确定要删除这场比赛吗？')) {
+                matches = matches.filter(m => m.id !== matchId);
+                localStorage.setItem('matches', JSON.stringify(matches));
+                loadMatches();
+            }
+        }
+
+        function deletePlayer(playerId) {
+            if (confirm('确定要删除这个球员吗？')) {
+                players = players.filter(p => p.id !== playerId);
+                localStorage.setItem('players', JSON.stringify(players));
+                loadPlayers();
+            }
+        }
+
+        // Update Functions
+        function updatePlayerStats(playerId, stat, value) {
+            const player = players.find(p => p.id === playerId);
+            if (player) {
+                player[stat] = parseInt(value);
+                localStorage.setItem('players', JSON.stringify(players));
+            }
+        }
+
+        function updateStreamUrl(matchId, url) {
+            const match = matches.find(m => m.id === matchId);
+            if (match) {
+                match.streamUrl = url;
+                localStorage.setItem('matches', JSON.stringify(matches));
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTeams();
+            loadMatches();
+            loadPlayers();
+            loadTeamStats();
+        });
+    </script>
+</body>
+</html> 
