@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>趣味古诗词背诵</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f9ff;
+            font-size: 16px;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2196F3;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .poetry-card {
+            border: 2px solid #4CAF50;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            background-color: #fff;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        .poetry-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .poetry-card h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+        .poetry-content {
+            font-size: 18px;
+            line-height: 1.8;
+            margin: 15px 0;
+            position: relative;
+        }
+        .poetry-explanation {
+            color: #666;
+            font-size: 16px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            margin-top: 10px;
+            display: none;
+            border-left: 4px solid #2196F3;
+        }
+        .game-section {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #e3f2fd;
+            border-radius: 15px;
+        }
+        .recite-game {
+            text-align: center;
+        }
+        .game-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .mode-switch {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            justify-content: center;
+        }
+        .mode-button {
+            background-color: #e0e0e0;
+            color: #666;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .mode-button.active {
+            background-color: #2196F3;
+            color: white;
+        }
+        .word-block {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            margin: 5px;
+            background-color: #bbdefb;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .word-block:hover {
+            background-color: #90caf9;
+            transform: scale(1.1);
+        }
+        .word-block.hidden {
+            background-color: #fff;
+            border: 2px dashed #bbdefb;
+            color: transparent;
+        }
+        .word-block.revealed {
+            animation: reveal 0.5s ease-out;
+        }
+        .hint-popup {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+        }
+        .word-block:hover .hint-popup {
+            display: block;
+        }
+        @keyframes reveal {
+            0% { transform: scale(0.3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+        button {
+            background-color: #2196F3;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #1976D2;
+            transform: scale(1.05);
+        }
+        .star {
+            color: gold;
+            font-size: 24px;
+            margin: 0 2px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.5s;
+        }
+        .hint-button {
+            background-color: #FF9800;
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+        .audio-button {
+            background-color: #9C27B0;
+        }
+        #stars-container {
+            text-align: center;
+            margin: 10px 0;
+        }
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            animation: confetti 4s linear infinite;
+        }
+        .upload-section {
+            text-align: center;
+            padding: 40px;
+            border: 3px dashed #bbdefb;
+            border-radius: 15px;
+            margin: 20px 0;
+            background-color: #f8f9fa;
+        }
+        .upload-section.active {
+            border-color: #4CAF50;
+            background-color: #e8f5e9;
+        }
+        .main-content {
+            display: none;
+        }
+        .main-content.active {
+            display: block;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .upload-button {
+            background-color: #2196F3;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        .upload-button:hover {
+            background-color: #1976D2;
+            transform: scale(1.05);
+        }
+        .upload-text {
+            margin: 20px 0;
+            color: #666;
+            font-size: 16px;
+        }
+        .success-message {
+            color: #4CAF50;
+            font-size: 18px;
+            margin-top: 10px;
+            display: none;
+        }
+        .achievement {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(0); }
+        }
+        .practice-modes {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .practice-mode {
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            background-color: #e0e0e0;
+            transition: all 0.3s;
+        }
+        .practice-mode:hover {
+            background-color: #2196F3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>趣味古诗词背诵</h1>
+        
+        <div class="upload-section" id="uploadSection">
+            <h2>请先上传古诗词文件</h2>
+            <p class="upload-text">上传JSON格式的古诗词文件开始学习</p>
+            <div class="file-input-wrapper">
+                <button class="upload-button">选择文件</button>
+                <input type="file" id="fileInput" accept=".json" onchange="handleFileSelect(event)">
+            </div>
+            <p class="success-message" id="successMessage">文件上传成功！正在加载学习内容...</p>
+        </div>
+
+        <div class="main-content" id="mainContent">
+            <div class="game-section">
+                <h2>今日学习</h2>
+                <div id="stars-container"></div>
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div class="practice-modes">
+                    <div class="practice-mode" onclick="setPracticeMode('normal')">普通模式</div>
+                    <div class="practice-mode" onclick="setPracticeMode('random')">随机隐藏</div>
+                    <div class="practice-mode" onclick="setPracticeMode('progressive')">渐进模式</div>
+                    <div class="practice-mode" onclick="setPracticeMode('challenge')">挑战模式</div>
+                </div>
+                <div class="recite-game">
+                    <div id="poetry-display"></div>
+                    <div class="game-controls">
+                        <button onclick="playAudio()" class="audio-button">朗读诗词</button>
+                        <button onclick="toggleExplanation()" class="hint-button">显示/隐藏释义</button>
+                        <button onclick="hideRandomWords()">随机隐藏</button>
+                        <button onclick="revealAll()">显示全部</button>
+                        <button onclick="checkRecitation()">检查背诵</button>
+                        <button onclick="nextPoem()">下一首</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let poems = [];
+        let currentPoemIndex = 0;
+        let stars = 0;
+        let progress = 0;
+        let currentMode = 'normal';
+        let hiddenWords = new Set();
+        let consecutiveCorrect = 0;
+
+        // 处理文件选择
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        poems = JSON.parse(e.target.result);
+                        // 筛选适合小学生的诗词
+                        poems = poems.filter(poem => 
+                            poem.content.length <= 8 && 
+                            !poem.content.some(line => line.length > 10)
+                        );
+                        
+                        if (poems.length > 0) {
+                            // 显示成功消息
+                            document.getElementById('successMessage').style.display = 'block';
+                            
+                            // 延迟一秒后显示主要内容
+                            setTimeout(() => {
+                                document.getElementById('uploadSection').style.display = 'none';
+                                document.getElementById('mainContent').classList.add('active');
+                                displayCurrentPoem();
+                                updateProgress();
+                            }, 1000);
+                        } else {
+                            alert('没有找到适合的诗词，请检查文件内容');
+                        }
+                    } catch (error) {
+                        alert('文件格式错误，请上传正确的JSON文件');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // 显示当前诗词
+        function displayCurrentPoem() {
+            if (poems.length === 0) return;
+            
+            const poem = poems[currentPoemIndex];
+            const display = document.getElementById('poetry-display');
+            display.innerHTML = '';
+
+            const title = document.createElement('h3');
+            title.textContent = poem.title + ' - ' + poem.author;
+            display.appendChild(title);
+
+            const content = document.createElement('div');
+            content.className = 'poetry-content';
+            poem.content.forEach((line, lineIndex) => {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'poetry-line';
+                line.split('').forEach((char, charIndex) => {
+                    const wordBlock = document.createElement('span');
+                    wordBlock.className = 'word-block';
+                    wordBlock.textContent = char;
+                    wordBlock.dataset.text = char;
+                    
+                    // 添加拼音提示（这里需要集成拼音库）
+                    const hint = document.createElement('div');
+                    hint.className = 'hint-popup';
+                    hint.textContent = '点击隐藏/显示';
+                    wordBlock.appendChild(hint);
+                    
+                    wordBlock.onclick = () => toggleWord(wordBlock);
+                    lineDiv.appendChild(wordBlock);
+                });
+                content.appendChild(lineDiv);
+            });
+            display.appendChild(content);
+
+            const explanation = document.createElement('div');
+            explanation.className = 'poetry-explanation';
+            explanation.textContent = poem.explanation;
+            display.appendChild(explanation);
+        }
+
+        // 切换字的显示/隐藏
+        function toggleWord(wordBlock) {
+            if (currentMode === 'challenge') return; // 挑战模式下不允许手动切换
+            
+            wordBlock.classList.toggle('hidden');
+            if (wordBlock.classList.contains('hidden')) {
+                hiddenWords.add(wordBlock);
+            } else {
+                hiddenWords.delete(wordBlock);
+                wordBlock.classList.add('revealed');
+                setTimeout(() => wordBlock.classList.remove('revealed'), 500);
+            }
+        }
+
+        // 朗读诗词
+        function playAudio() {
+            const poem = poems[currentPoemIndex];
+            const text = poem.content.join('，');
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            speechSynthesis.speak(utterance);
+        }
+
+        // 显示提示
+        function toggleExplanation() {
+            const explanation = document.querySelector('.poetry-explanation');
+            if (explanation.style.display === 'none' || !explanation.style.display) {
+                explanation.style.display = 'block';
+            } else {
+                explanation.style.display = 'none';
+            }
+        }
+
+        function hideRandomWords() {
+            const words = document.querySelectorAll('.word-block');
+            hiddenWords.clear();
+            words.forEach(word => {
+                if (Math.random() < 0.5) {
+                    word.classList.add('hidden');
+                    hiddenWords.add(word);
+                } else {
+                    word.classList.remove('hidden');
+                }
+            });
+        }
+
+        function revealAll() {
+            document.querySelectorAll('.word-block').forEach(word => {
+                word.classList.remove('hidden');
+            });
+            hiddenWords.clear();
+        }
+
+        function startProgressiveMode() {
+            revealAll();
+            let currentLine = 0;
+            const interval = setInterval(() => {
+                const lines = document.querySelectorAll('.poetry-line');
+                if (currentLine < lines.length) {
+                    const words = lines[currentLine].querySelectorAll('.word-block');
+                    words.forEach(word => {
+                        word.classList.add('hidden');
+                        hiddenWords.add(word);
+                    });
+                    currentLine++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 5000);
+        }
+
+        function startChallengeMode() {
+            revealAll();
+            const words = document.querySelectorAll('.word-block');
+            let remainingTime = 30;
+            
+            // 先给用户时间记忆
+            const timer = document.createElement('div');
+            timer.style.fontSize = '24px';
+            timer.style.textAlign = 'center';
+            timer.style.margin = '10px 0';
+            document.querySelector('.recite-game').prepend(timer);
+
+            const countDown = setInterval(() => {
+                timer.textContent = `记忆时间还剩: ${remainingTime}秒`;
+                remainingTime--;
+                if (remainingTime < 0) {
+                    clearInterval(countDown);
+                    timer.remove();
+                    words.forEach(word => {
+                        word.classList.add('hidden');
+                        hiddenWords.add(word);
+                    });
+                }
+            }, 1000);
+        }
+
+        // 检查背诵
+        function checkRecitation() {
+            const hiddenBlocks = Array.from(hiddenWords);
+            if (hiddenBlocks.length === 0) {
+                alert('请先隐藏一些字再开始背诵！');
+                return;
+            }
+
+            let correct = true;
+            let revealedCount = 0;
+
+            hiddenBlocks.forEach(word => {
+                const userInput = prompt(`请输入隐藏的字"${word.dataset.text}"：`);
+                if (userInput === word.dataset.text) {
+                    word.classList.remove('hidden');
+                    word.classList.add('revealed');
+                    hiddenWords.delete(word);
+                    revealedCount++;
+                } else {
+                    correct = false;
+                }
+            });
+
+            if (correct) {
+                consecutiveCorrect++;
+                showAchievement(`太棒了！你已经连续答对${consecutiveCorrect}次！`);
+                addStar();
+            } else {
+                consecutiveCorrect = 0;
+            }
+
+            updateProgress();
+        }
+
+        // 添加星星
+        function addStar() {
+            stars++;
+            const container = document.getElementById('stars-container');
+            container.innerHTML = '⭐'.repeat(stars);
+            updateProgress();
+        }
+
+        // 更新进度
+        function updateProgress() {
+            progress = (stars / 10) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+        }
+
+        // 下一首诗
+        function nextPoem() {
+            currentPoemIndex = (currentPoemIndex + 1) % poems.length;
+            displayCurrentPoem();
+        }
+
+        function showAchievement(message) {
+            const achievement = document.createElement('div');
+            achievement.className = 'achievement';
+            achievement.textContent = message;
+            document.body.appendChild(achievement);
+            achievement.style.display = 'block';
+            
+            setTimeout(() => {
+                achievement.style.opacity = '0';
+                setTimeout(() => achievement.remove(), 500);
+            }, 3000);
+        }
+
+        function setPracticeMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.practice-mode').forEach(btn => {
+                btn.style.backgroundColor = '#e0e0e0';
+                btn.style.color = 'black';
+            });
+            event.target.style.backgroundColor = '#2196F3';
+            event.target.style.color = 'white';
+            
+            resetGame();
+            switch(mode) {
+                case 'random':
+                    hideRandomWords();
+                    break;
+                case 'progressive':
+                    startProgressiveMode();
+                    break;
+                case 'challenge':
+                    startChallengeMode();
+                    break;
+            }
+        }
+
+        function resetGame() {
+            hiddenWords.clear();
+            consecutiveCorrect = 0;
+            updateProgress();
+        }
+
+        // 初始化时不自动加载诗词
+        document.addEventListener('DOMContentLoaded', function() {
+            // 页面加载时不执行任何操作，等待用户上传文件
+        });
+    </script>
+</body>
+</html> 

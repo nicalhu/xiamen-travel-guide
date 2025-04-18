@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>EdgeOne MCP 封面图</title>
+    <style>
+        :root {
+            --primary-color: #1e40af;
+            --secondary-color: #ffffff;
+            --auxiliary-color: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            background: #000;
+        }
+
+        .container {
+            display: flex;
+            width: 1710px;
+            height: 510px;
+        }
+
+        /* 宽版图样式 */
+        .wide-cover {
+            width: 1200px;
+            height: 510px;
+            background: linear-gradient(45deg, #1e40af, #3b82f6);
+            position: relative;
+            display: flex;
+            padding: 2rem;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* 转发图样式 */
+        .square-cover {
+            width: 510px;
+            height: 510px;
+            background: linear-gradient(45deg, #1e40af, #3b82f6);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* 宽版图内容布局 */
+        .wide-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            z-index: 2;
+        }
+
+        .title-area {
+            width: 70%;
+        }
+
+        .features-area {
+            width: 30%;
+        }
+
+        /* 标题样式 */
+        .first-line {
+            font-size: 3.5rem;
+            color: #60a5fa;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            white-space: nowrap;
+        }
+
+        .second-line {
+            font-size: 4rem;
+            color: white;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+
+        /* 功能亮点样式 */
+        .feature-card {
+            background: var(--auxiliary-color);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .feature-card i {
+            color: #60a5fa;
+            margin-right: 0.5rem;
+        }
+
+        /* 装饰效果 */
+        .glow {
+            position: absolute;
+            width: 144px;
+            height: 144px;
+            background: var(--primary-color);
+            filter: blur(48px);
+            opacity: 0.15;
+        }
+
+        .noise {
+            position: absolute;
+            inset: 0;
+            background-image: url('data:image/svg+xml,...');
+            opacity: 0.03;
+            mix-blend-mode: overlay;
+        }
+
+        /* 转发图标题样式 */
+        .square-title {
+            text-align: center;
+            color: white;
+        }
+
+        .square-first-line {
+            font-size: 2.5rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            margin-bottom: 1rem;
+        }
+
+        .square-second-line {
+            font-size: 3rem;
+            font-weight: 800;
+            background: rgba(96,165,250,0.2);
+            padding: 0.5rem 2rem;
+            border-radius: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 宽版图 -->
+        <div class="wide-cover">
+            <div class="glow" style="top: 20%; left: 30%;"></div>
+            <div class="glow" style="bottom: 20%; right: 20%;"></div>
+            <div class="noise"></div>
+            <div class="wide-content">
+                <div class="title-area">
+                    <div class="first-line">零基础入门</div>
+                    <div class="second-line">免费部署网站神器</div>
+                </div>
+                <div class="features-area">
+                    <div class="feature-card">
+                        <i>🆓</i>完全免费部署
+                    </div>
+                    <div class="feature-card">
+                        <i>🤖</i>AI智能辅助
+                    </div>
+                    <div class="feature-card">
+                        <i>⚡</i>一键快速上线
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 转发图 -->
+        <div class="square-cover">
+            <div class="glow" style="top: 30%; left: 30%;"></div>
+            <div class="noise"></div>
+            <div class="square-title">
+                <div class="square-first-line">零基础</div>
+                <div class="square-second-line">搞定MCP</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

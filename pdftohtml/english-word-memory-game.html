@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英语单词速记翻牌游戏 - 四年级KET词汇</title>
+    <!-- TailwindCSS 通过CDN引入 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // 配置Tailwind主题
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        accent: {
+                            50: '#fdf4ff',
+                            100: '#fae8ff',
+                            200: '#f5d0fe',
+                            300: '#f0abfc',
+                            400: '#e879f9',
+                            500: '#d946ef',
+                            600: '#c026d3',
+                            700: '#a21caf',
+                            800: '#86198f',
+                            900: '#701a75',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Comic Sans MS', 'Comic Sans', 'cursive', 'system-ui', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        /* 自定义样式 */
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+        
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 卡片翻转动画 */
+        .card-container {
+            perspective: 1000px;
+        }
+        
+        .card {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        
+        /* 胜利动画 */
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .celebrate {
+            animation: celebrate 0.5s ease-in-out 3;
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        
+        /* 按钮悬停效果 */
+        .hover-button {
+            transition: all 0.2s ease;
+        }
+        
+        .hover-button:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 卡片悬停效果 */
+        .card-container:hover .card:not(.flipped):not(.matched) {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-5px);
+        }
+        
+        /* 淡入动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        /* 计时器闪烁动画 */
+        @keyframes timerPulse {
+            0% { color: inherit; }
+            50% { color: #ef4444; }
+            100% { color: inherit; }
+        }
+        
+        .timer-low {
+            animation: timerPulse 1s infinite;
+        }
+    </style>
+</head>
+<body class="bg-primary-50 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-100 transition-colors duration-300 min-h-screen">
+    <!-- 主题切换按钮 -->
+    <button id="theme-toggle" class="fixed top-4 right-4 z-50 p-2 rounded-full bg-white dark:bg-secondary-800 shadow-md hover-button">
+        <i class="fas fa-sun text-yellow-500 dark:hidden"></i>
+        <i class="fas fa-moon text-blue-300 hidden dark:block"></i>
+    </button>
+
+    <!-- 游戏容器 -->
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- 游戏标题 -->
+        <header class="text-center mb-8 animate-fade-in">
+            <div class="flex items-center justify-center mb-4">
+                <div class="bg-primary-600 text-white p-3 rounded-lg mr-3">
+                    <i class="fas fa-gamepad text-2xl"></i>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-bold text-primary-700 dark:text-primary-300">英语单词速记翻牌</h1>
+            </div>
+            <p class="text-lg text-secondary-600 dark:text-secondary-400">找到匹配的英语单词和中文意思，提高你的词汇量！</p>
+        </header>
+
+        <!-- 游戏控制面板 -->
+        <div class="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-4 mb-8 animate-fade-in" style="animation-delay: 0.1s;">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <div>
+                        <label for="difficulty" class="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">难度级别:</label>
+                        <select id="difficulty" class="bg-secondary-50 dark:bg-secondary-700 border border-secondary-300 dark:border-secondary-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <option value="easy">简单 (6对)</option>
+                            <option value="medium" selected>中等 (8对)</option>
+                            <option value="hard">困难 (12对)</option>
+                            <option value="expert">专家 (16对)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="word-category" class="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">单词类别:</label>
+                        <select id="word-category" class="bg-secondary-50 dark:bg-secondary-700 border border-secondary-300 dark:border-secondary-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <option value="animals">动物</option>
+                            <option value="food" selected>食物</option>
+                            <option value="colors">颜色</option>
+                            <option value="school">学校</option>
+                            <option value="family">家庭</option>
+                            <option value="sports">运动</option>
+                            <option value="mixed">混合</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="text-center">
+                        <div class="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">时间</div>
+                        <div id="timer" class="text-xl font-bold text-primary-600 dark:text-primary-400">00:00</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">得分</div>
+                        <div id="score" class="text-xl font-bold text-accent-600 dark:text-accent-400">0</div>
+                    </div>
+                    <button id="start-game" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-lg shadow hover-button">
+                        <i class="fas fa-play mr-1"></i> 开始游戏
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏说明 -->
+        <div id="game-instructions" class="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6 mb-8 animate-fade-in" style="animation-delay: 0.2s;">
+            <h2 class="text-xl font-bold text-primary-700 dark:text-primary-300 mb-4">游戏说明</h2>
+            <ul class="list-disc pl-5 text-secondary-700 dark:text-secondary-300 space-y-2">
+                <li>点击卡片翻开，找到匹配的英语单词和中文意思</li>
+                <li>每次只能翻开两张卡片，如果匹配则保持翻开状态</li>
+                <li>如果不匹配，卡片会自动翻回</li>
+                <li>找出所有匹配的单词对，游戏结束</li>
+                <li>尽量用最少的时间和最少的翻牌次数完成游戏</li>
+            </ul>
+            <div class="mt-4 text-center">
+                <button id="start-game-intro" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-6 rounded-lg shadow hover-button text-lg">
+                    <i class="fas fa-play mr-2"></i> 开始游戏
+                </button>
+            </div>
+        </div>
+
+        <!-- 游戏区域 -->
+        <div id="game-board" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8 animate-fade-in" style="animation-delay: 0.3s;">
+            <!-- 卡片将通过JavaScript动态生成 -->
+        </div>
+
+        <!-- 游戏结果 -->
+        <div id="game-result" class="hidden bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6 text-center mb-8 animate-fade-in">
+            <h2 class="text-2xl font-bold text-primary-700 dark:text-primary-300 mb-4">游戏结束！</h2>
+            <div class="flex flex-wrap justify-center gap-6 mb-6">
+                <div class="bg-secondary-50 dark:bg-secondary-700 p-4 rounded-lg">
+                    <div class="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">用时</div>
+                    <div id="result-time" class="text-xl font-bold text-primary-600 dark:text-primary-400">00:00</div>
+                </div>
+                <div class="bg-secondary-50 dark:bg-secondary-700 p-4 rounded-lg">
+                    <div class="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">得分</div>
+                    <div id="result-score" class="text-xl font-bold text-accent-600 dark:text-accent-400">0</div>
+                </div>
+                <div class="bg-secondary-50 dark:bg-secondary-700 p-4 rounded-lg">
+                    <div class="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">翻牌次数</div>
+                    <div id="result-flips" class="text-xl font-bold text-secondary-600 dark:text-secondary-400">0</div>
+                </div>
+            </div>
+            <div id="result-message" class="text-lg text-secondary-700 dark:text-secondary-300 mb-6">
+                太棒了！你成功匹配了所有单词！
+            </div>
+            <div class="flex justify-center space-x-4">
+                <button id="play-again" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-6 rounded-lg shadow hover-button">
+                    <i class="fas fa-redo mr-2"></i> 再玩一次
+                </button>
+                <button id="show-words" class="bg-secondary-600 hover:bg-secondary-700 text-white font-bold py-2 px-6 rounded-lg shadow hover-button">
+                    <i class="fas fa-book mr-2"></i> 查看单词表
+                </button>
+            </div>
+        </div>
+
+        <!-- 单词表 -->
+        <div id="word-list" class="hidden bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6 mb-8 animate-fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-primary-700 dark:text-primary-300">本局游戏单词表</h2>
+                <button id="close-word-list" class="text-secondary-500 hover:text-secondary-700 dark:text-secondary-400 dark:hover:text-secondary-200">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-secondary-200 dark:divide-secondary-700">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">英语</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">中文</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">发音</th>
+                        </tr>
+                    </thead>
+                    <tbody id="word-list-body" class="divide-y divide-secondary-200 dark:divide-secondary-700">
+                        <!-- 单词列表将通过JavaScript动态生成 -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4 text-center">
+                <button id="back-to-result" class="bg-secondary-600 hover:bg-secondary-700 text-white font-bold py-2 px-6 rounded-lg shadow hover-button">
+                    <i class="fas fa-arrow-left mr-2"></i> 返回结果
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="mt-12 border-t border-secondary-200 dark:border-secondary-700 pt-8 pb-16 animate-fade-in" style="animation-delay: 0.6s;">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="md:col-span-2">
+                    <h3 class="text-xl font-bold mb-4 text-secondary-900 dark:text-white">关于作者</h3>
+                    <p class="text-secondary-700 dark:text-secondary-300 mb-4">
+                        王老师是一位充满热情的四年级英语教师，致力于通过有趣的互动方式帮助学生掌握英语词汇。这款单词速记翻牌游戏是专为KET级别词汇学习设计的课堂互动工具。
+                    </p>
+                    <div class="flex items-center space-x-4 mt-6">
+                        <a href="https://twitter.com/englishteacher" target="_blank" rel="noopener noreferrer" class="text-secondary-600 hover:text-primary-600 dark:text-secondary-400 dark:hover:text-primary-400 transition-colors">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="https://linkedin.com/in/englishteacher" target="_blank" rel="noopener noreferrer" class="text-secondary-600 hover:text-primary-600 dark:text-secondary-400 dark:hover:text-primary-400 transition-colors">
+                            <i class="fab fa-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-secondary-900 dark:text-white">联系方式</h3>
+                    <ul class="space-y-2 text-secondary-700 dark:text-secondary-300">
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-envelope text-secondary-500 dark:text-secondary-400"></i>
+                            <span>teacher@example.com</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-school text-secondary-500 dark:text-secondary-400"></i>
+                            <span>阳光小学</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-secondary-200 dark:border-secondary-700 text-center text-secondary-600 dark:text-secondary-400 text-sm">
+                <p>© 2023 英语单词速记翻牌游戏. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 游戏逻辑脚本 -->
+    <script>
+        // 单词库
+        const wordCategories = {
+            animals: [
+                { english: "cat", chinese: "猫" },
+                { english: "dog", chinese: "狗" },
+                { english: "bird", chinese: "鸟" },
+                { english: "fish", chinese: "鱼" },
+                { english: "rabbit", chinese: "兔子" },
+                { english: "tiger", chinese: "老虎" },
+                { english: "lion", chinese: "狮子" },
+                { english: "elephant", chinese: "大象" },
+                { english: "monkey", chinese: "猴子" },
+                { english: "panda", chinese: "熊猫" },
+                { english: "bear", chinese: "熊" },
+                { english: "snake", chinese: "蛇" },
+                { english: "frog", chinese: "青蛙" },
+                { english: "turtle", chinese: "乌龟" },
+                { english: "giraffe", chinese: "长颈鹿" },
+                { english: "zebra", chinese: "斑马" }
+            ],
+            food: [
+                { english: "apple", chinese: "苹果" },
+                { english: "banana", chinese: "香蕉" },
+                { english: "orange", chinese: "橙子" },
+                { english: "bread", chinese: "面包" },
+                { english: "cake", chinese: "蛋糕" },
+                { english: "rice", chinese: "米饭" },
+                { english: "egg", chinese: "鸡蛋" },
+                { english: "milk", chinese: "牛奶" },
+                { english: "water", chinese: "水" },
+                { english: "juice", chinese: "果汁" },
+                { english: "chicken", chinese: "鸡肉" },
+                { english: "beef", chinese: "牛肉" },
+                { english: "vegetable", chinese: "蔬菜" },
+                { english: "fruit", chinese: "水果" },
+                { english: "ice cream", chinese: "冰淇淋" },
+                { english: "chocolate", chinese: "巧克力" }
+            ],
+            colors: [
+                { english: "red", chinese: "红色" },
+                { english: "blue", chinese: "蓝色" },
+                { english: "yellow", chinese: "黄色" },
+                { english: "green", chinese: "绿色" },
+                { english: "black", chinese: "黑色" },
+                { english: "white", chinese: "白色" },
+                { english: "purple", chinese: "紫色" },
+                { english: "orange", chinese: "橙色" },
+                { english: "pink", chinese: "粉色" },
+                { english: "brown", chinese: "棕色" },
+                { english: "grey", chinese: "灰色" },
+                { english: "gold", chinese: "金色" },
+                { english: "silver", chinese: "银色" },
+                { english: "dark blue", chinese: "深蓝色" },
+                { english: "light green", chinese: "浅绿色" },
+                { english: "navy blue", chinese: "海军蓝" }
+            ],
+            school: [
+                { english: "teacher", chinese: "老师" },
+                { english: "student", chinese: "学生" },
+                { english: "classroom", chinese: "教室" },
+                { english: "book", chinese: "书" },
+                { english: "pen", chinese: "钢笔" },
+                { english: "pencil", chinese: "铅笔" },
+                { english: "ruler", chinese: "尺子" },
+                { english: "eraser", chinese: "橡皮" },
+                { english: "bag", chinese: "书包" },
+                { english: "desk", chinese: "课桌" },
+                { english: "chair", chinese: "椅子" },
+                { english: "blackboard", chinese: "黑板" },
+                { english: "homework", chinese: "家庭作业" },
+                { english: "library", chinese: "图书馆" },
+                { english: "computer", chinese: "电脑" },
+                { english: "notebook", chinese: "笔记本" }
+            ],
+            family: [
+                { english: "father", chinese: "爸爸" },
+                { english: "mother", chinese: "妈妈" },
+                { english: "brother", chinese: "兄弟" },
+                { english: "sister", chinese: "姐妹" },
+                { english: "grandfather", chinese: "爷爷" },
+                { english: "grandmother", chinese: "奶奶" },
+                { english: "uncle", chinese: "叔叔" },
+                { english: "aunt", chinese: "阿姨" },
+                { english: "cousin", chinese: "堂兄弟姐妹" },
+                { english: "son", chinese: "儿子" },
+                { english: "daughter", chinese: "女儿" },
+                { english: "baby", chinese: "婴儿" },
+                { english: "family", chinese: "家庭" },
+                { english: "parents", chinese: "父母" },
+                { english: "husband", chinese: "丈夫" },
+                { english: "wife", chinese: "妻子" }
+            ],
+            sports: [
+                { english: "football", chinese: "足球" },
+                { english: "basketball", chinese: "篮球" },
+                { english: "swimming", chinese: "游泳" },
+                { english: "running", chinese: "跑步" },
+                { english: "tennis", chinese: "网球" },
+                { english: "badminton", chinese: "羽毛球" },
+                { english: "volleyball", chinese: "排球" },
+                { english: "baseball", chinese: "棒球" },
+                { english: "table tennis", chinese: "乒乓球" },
+                { english: "cycling", chinese: "骑自行车" },
+                { english: "skating", chinese: "滑冰" },
+                { english: "skiing", chinese: "滑雪" },
+                { english: "golf", chinese: "高尔夫" },
+                { english: "dance", chinese: "跳舞" },
+                { english: "yoga", chinese: "瑜伽" },
+                { english: "martial arts", chinese: "武术" }
+            ]
+        };
+
+        // 混合类别的单词
+        wordCategories.mixed = [];
+        for (const category in wordCategories) {
+            if (category !== 'mixed') {
+                // 从每个类别中随机选择4个单词
+                const randomWords = [...wordCategories[category]]
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 4);
+                wordCategories.mixed.push(...randomWords);
+            }
+        }
+
+        // 游戏状态
+        let gameState = {
+            cards: [],
+            flippedCards: [],
+            matchedPairs: 0,
+            totalPairs: 0,
+            flips: 0,
+            score: 0,
+            timer: 0,
+            timerInterval: null,
+            gameStarted: false,
+            currentWords: []
+        };
+
+        // DOM元素
+        const gameBoard = document.getElementById('game-board');
+        const gameInstructions = document.getElementById('game-instructions');
+        const gameResult = document.getElementById('game-result');
+        const wordList = document.getElementById('word-list');
+        const wordListBody = document.getElementById('word-list-body');
+        const timerElement = document.getElementById('timer');
+        const scoreElement = document.getElementById('score');
+        const resultTimeElement = document.getElementById('result-time');
+        const resultScoreElement = document.getElementById('result-score');
+        const resultFlipsElement = document.getElementById('result-flips');
+        const resultMessageElement = document.getElementById('result-message');
+        const difficultySelect = document.getElementById('difficulty');
+        const categorySelect = document.getElementById('word-category');
+        const startGameButton = document.getElementById('start-game');
+        const startGameIntroButton = document.getElementById('start-game-intro');
+        const playAgainButton = document.getElementById('play-again');
+        const showWordsButton = document.getElementById('show-words');
+        const closeWordListButton = document.getElementById('close-word-list');
+        const backToResultButton = document.getElementById('back-to-result');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        // 主题切换功能
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        themeToggleBtn.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
+
+        // 格式化时间
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // 更新计时器
+        function updateTimer() {
+            gameState.timer++;
+            timerElement.textContent = formatTime(gameState.timer);
+            
+            // 如果时间超过1分钟，添加闪烁效果
+            if (gameState.timer > 60) {
+                timerElement.classList.add('timer-low');
+            }
+        }
+
+        // 创建卡片
+        function createCard(content, type, index) {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card-container aspect-square';
+            cardContainer.innerHTML = `
+                <div class="card" data-index="${index}" data-type="${type}" data-content="${content}">
+                    <div class="card-front bg-white dark:bg-secondary-700 border-2 border-primary-200 dark:border-primary-800 shadow-sm">
+                        <span class="text-2xl font-bold text-primary-500 dark:text-primary-300">?</span>
+                    </div>
+                    <div class="card-back bg-primary-100 dark:bg-primary-900 border-2 border-primary-300 dark:border-primary-700 shadow-md">
+                        <span class="text-lg font-bold text-primary-800 dark:text-primary-200 px-2 text-center">${content}</span>
+                    </div>
+                </div>
+            `;
+            
+            cardContainer.addEventListener('click', () => {
+                if (gameState.gameStarted && !gameState.flippedCards.includes(index) && gameState.flippedCards.length < 2) {
+                    flipCard(index);
+                }
+            });
+            
+            return cardContainer;
+        }
+
+        // 翻转卡片
+        function flipCard(index) {
+            if (gameState.flippedCards.includes(index)) return;
+            
+            const card = document.querySelector(`.card[data-index="${index}"]`);
+            card.classList.add('flipped');
+            gameState.flippedCards.push(index);
+            gameState.flips++;
+            
+            if (gameState.flippedCards.length === 2) {
+                checkMatch();
+            }
+        }
+
+        // 检查匹配
+        function checkMatch() {
+            const [index1, index2] = gameState.flippedCards;
+            const card1 = document.querySelector(`.card[data-index="${index1}"]`);
+            const card2 = document.querySelector(`.card[data-index="${index2}"]`);
+            
+            const type1 = card1.getAttribute('data-type');
+            const type2 = card2.getAttribute('data-type');
+            const content1 = card1.getAttribute('data-content');
+            const content2 = card2.getAttribute('data-content');
+            
+            // 找到对应的单词对象
+            const word1 = gameState.currentWords.find(w => 
+                (type1 === 'english' && w.english === content1) || 
+                (type1 === 'chinese' && w.chinese === content1)
+            );
+            
+            const word2 = gameState.currentWords.find(w => 
+                (type2 === 'english' && w.english === content2) || 
+                (type2 === 'chinese' && w.chinese === content2)
+            );
+            
+            // 检查是否匹配（一个是英文，一个是中文，且属于同一个单词对）
+            const isMatch = type1 !== type2 && word1 === word2;
+            
+            setTimeout(() => {
+                if (isMatch) {
+                    // 匹配成功
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    
+                    // 添加匹配成功的样式
+                    card1.querySelector('.card-back').classList.add('bg-green-100', 'dark:bg-green-900', 'border-green-300', 'dark:border-green-700');
+                    card2.querySelector('.card-back').classList.add('bg-green-100', 'dark:bg-green-900', 'border-green-300', 'dark:border-green-700');
+                    
+                    // 更新游戏状态
+                    gameState.matchedPairs++;
+                    gameState.score += 10 + Math.max(0, 20 - Math.floor(gameState.timer / 3));
+                    scoreElement.textContent = gameState.score;
+                    
+                    // 检查游戏是否结束
+                    if (gameState.matchedPairs === gameState.totalPairs) {
+                        endGame();
+                    }
+                } else {
+                    // 匹配失败，翻回卡片
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    
+                    // 扣分
+                    gameState.score = Math.max(0, gameState.score - 2);
+                    scoreElement.textContent = gameState.score;
+                }
+                
+                // 重置翻转状态
+                gameState.flippedCards = [];
+            }, 1000);
+        }
+
+        // 洗牌算法
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // 初始化游戏
+        function initGame() {
+            // 清空游戏板
+            gameBoard.innerHTML = '';
+            
+            // 重置游戏状态
+            gameState.flippedCards = [];
+            gameState.matchedPairs = 0;
+            gameState.flips = 0;
+            gameState.score = 0;
+            gameState.timer = 0;
+            gameState.gameStarted = true;
+            
+            // 更新UI
+            timerElement.textContent = '00:00';
+            scoreElement.textContent = '0';
+            timerElement.classList.remove('timer-low');
+            
+            // 获取难度和类别
+            const difficulty = difficultySelect.value;
+            const category = categorySelect.value;
+            
+            // 根据难度设置卡片数量
+            let pairCount;
+            switch (difficulty) {
+                case 'easy': pairCount = 6; break;
+                case 'medium': pairCount = 8; break;
+                case 'hard': pairCount = 12; break;
+                case 'expert': pairCount = 16; break;
+                default: pairCount = 8;
+            }
+            
+            // 设置总对数
+            gameState.totalPairs = pairCount;
+            
+            // 获取单词
+            const allWords = wordCategories[category];
+            const selectedWords = shuffleArray(allWords).slice(0, pairCount);
+            gameState.currentWords = selectedWords;
+            
+            // 创建卡片数组
+            const cards = [];
+            selectedWords.forEach((word, index) => {
+                cards.push({ content: word.english, type: 'english', index: index * 2 });
+                cards.push({ content: word.chinese, type: 'chinese', index: index * 2 + 1 });
+            });
+            
+            // 洗牌
+            const shuffledCards = shuffleArray(cards);
+            
+            // 创建卡片元素
+            shuffledCards.forEach(card => {
+                const cardElement = createCard(card.content, card.type, card.index);
+                gameBoard.appendChild(cardElement);
+            });
+            
+            // 设置游戏板的网格列数
+            if (pairCount <= 6) {
+                gameBoard.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8 animate-fade-in';
+            } else if (pairCount <= 8) {
+                gameBoard.className = 'grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-4 mb-8 animate-fade-in';
+            } else if (pairCount <= 12) {
+                gameBoard.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 mb-8 animate-fade-in';
+            } else {
+                gameBoard.className = 'grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 mb-8 animate-fade-in';
+            }
+            
+            // 显示游戏板
+            gameInstructions.classList.add('hidden');
+            gameResult.classList.add('hidden');
+            wordList.classList.add('hidden');
+            gameBoard.classList.remove('hidden');
+            
+            // 开始计时器
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            gameState.timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        // 结束游戏
+        function endGame() {
+            // 停止计时器
+            clearInterval(gameState.timerInterval);
+            gameState.gameStarted = false;
+            
+            // 更新结果
+            resultTimeElement.textContent = formatTime(gameState.timer);
+            resultScoreElement.textContent = gameState.score;
+            resultFlipsElement.textContent = gameState.flips;
+            
+            // 根据得分和时间生成评价信息
+            let message = '';
+            if (gameState.score >= gameState.totalPairs * 15) {
+                message = '太棒了！你的记忆力超强！';
+            } else if (gameState.score >= gameState.totalPairs * 10) {
+                message = '做得很好！继续练习，你会更厉害！';
+            } else {
+                message = '不错的尝试！再来一次，你一定能做得更好！';
+            }
+            resultMessageElement.textContent = message;
+            
+            // 显示结果
+            setTimeout(() => {
+                gameBoard.classList.add('hidden');
+                gameResult.classList.remove('hidden');
+                gameResult.classList.add('celebrate');
+                
+                // 移除庆祝动画
+                setTimeout(() => {
+                    gameResult.classList.remove('celebrate');
+                }, 1500);
+            }, 1000);
+            
+            // 生成单词表
+            generateWordList();
+        }
+
+        // 生成单词表
+        function generateWordList() {
+            wordListBody.innerHTML = '';
+            
+            gameState.currentWords.forEach(word => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">${word.english}</td>
+                    <td class="px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">${word.chinese}</td>
+                    <td class="px-4 py-3 text-sm">
+                        <button class="speak-button px-2 py-1 bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200 rounded hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors" data-word="${word.english}">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </td>
+                `;
+                wordListBody.appendChild(row);
+            });
+            
+            // 添加发音功能
+            document.querySelectorAll('.speak-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const word = button.getAttribute('data-word');
+                    speakWord(word);
+                });
+            });
+        }
+
+        // 单词发音
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // 事件监听器
+        startGameButton.addEventListener('click', initGame);
+        startGameIntroButton.addEventListener('click', initGame);
+        playAgainButton.addEventListener('click', initGame);
+        
+        showWordsButton.addEventListener('click', () => {
+            gameResult.classList.add('hidden');
+            wordList.classList.remove('hidden');
+        });
+        
+        closeWordListButton.addEventListener('click', () => {
+            wordList.classList.add('hidden');
+            gameResult.classList.remove('hidden');
+        });
+        
+        backToResultButton.addEventListener('click', () => {
+            wordList.classList.add('hidden');
+            gameResult.classList.remove('hidden');
+        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 添加滚动动画
+            const animatedElements = document.querySelectorAll('.animate-fade-in');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四年级古诗词互动小游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #ff7675;
+            --secondary-color: #fdcb6e;
+            --success-color: #00b894;
+            --error-color: #d63031;
+            --bg-light: #f8f9fc;
+            --text-dark: #2d3436;
+            --shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f8f9fc"/><path d="M0 0L100 100M100 0L0 100" stroke="%23eee" stroke-width="1"/></svg>');
+            background-size: 20px 20px;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff7675, #d63031);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .game-area {
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .mode-switch {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .mode-btn {
+            padding: 8px 15px;
+            margin: 0 5px 5px;
+            border: none;
+            border-radius: 20px;
+            background-color: #eee;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mode-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .poem-display {
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            position: relative;
+            min-height: 200px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23fff"/><path d="M0 20h100M0 40h100M0 60h100M0 80h100" stroke="%23f0f0f0" stroke-width="1"/></svg>');
+            background-size: 100% 20px;
+        }
+        
+        .poem-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .poem-author {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #888;
+        }
+        
+        .poem-content {
+            font-size: 18px;
+            line-height: 1.8;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .poem-translation {
+            font-size: 14px;
+            color: #666;
+            text-align: left;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        .quiz-container {
+            margin: 20px auto;
+            max-width: 600px;
+            display: none;
+        }
+        
+        .quiz-question {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: rgba(253, 203, 110, 0.2);
+            border-radius: 5px;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .quiz-option {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quiz-option:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .quiz-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 118, 117, 0.1);
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background-color: rgba(0, 184, 148, 0.2);
+            color: var(--success-color);
+        }
+        
+        .feedback.incorrect {
+            background-color: rgba(214, 48, 49, 0.2);
+            color: var(--error-color);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            background-color: #e74c3c;
+        }
+        
+        .file-upload {
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        
+        .file-upload label {
+            display: block;
+            padding: 10px;
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload label:hover {
+            background-color: #f0b055;
+        }
+        
+        .file-upload input {
+            display: none;
+        }
+        
+        .progress-container {
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 0;
+            transition: width 0.5s;
+        }
+        
+        .score-display {
+            margin-top: 10px;
+            font-size: 16px;
+            color: var(--text-dark);
+        }
+        
+        .stars-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        .star {
+            font-size: 24px;
+            color: #ddd;
+            margin: 0 5px;
+        }
+        
+        .star.earned {
+            color: var(--secondary-color);
+        }
+        
+        .hint-container {
+            min-height: 30px;
+            margin: 10px 0;
+            font-size: 16px;
+            color: var(--primary-color);
+        }
+        
+        .student-picker {
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        
+        .student-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        
+        .student-item {
+            padding: 5px 10px;
+            background-color: #eee;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        
+        .student-item.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .fill-blank-container {
+            margin: 20px auto;
+            max-width: 600px;
+            display: none;
+        }
+        
+        .fill-blank-poem {
+            font-size: 18px;
+            line-height: 2;
+            text-align: center;
+        }
+        
+        .blank {
+            display: inline-block;
+            width: 80px;
+            height: 30px;
+            border-bottom: 1px solid #000;
+            margin: 0 5px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .blank input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .match-container {
+            margin: 20px auto;
+            max-width: 600px;
+            display: none;
+        }
+        
+        .match-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .match-item {
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .match-item.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .match-item.matched {
+            background-color: var(--success-color);
+            color: white;
+            cursor: default;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+        
+        .floating {
+            animation: float 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>古诗词互动小游戏</h1>
+            <p>四年级语文课堂</p>
+        </div>
+        
+        <div class="game-area">
+            <div class="mode-switch">
+                <button class="mode-btn active" data-mode="explore">诗词欣赏</button>
+                <button class="mode-btn" data-mode="quiz">诗词问答</button>
+                <button class="mode-btn" data-mode="fill">填空游戏</button>
+                <button class="mode-btn" data-mode="match">诗句配对</button>
+            </div>
+            
+            <div class="file-upload">
+                <label for="json-upload">上传诗词数据 (JSON格式)</label>
+                <input type="file" id="json-upload" accept=".json">
+            </div>
+            
+            <div class="poem-display" id="poem-display">
+                <div class="poem-title" id="poem-title">静夜思</div>
+                <div class="poem-author" id="poem-author">唐代 · 李白</div>
+                <div class="poem-content" id="poem-content">
+                    床前明月光，疑是地上霜。<br>
+                    举头望明月，低头思故乡。
+                </div>
+                <div class="poem-translation" id="poem-translation">
+                    译文：床前明亮的月光，好像地上的一层霜。抬头望望那明月，低头想念我的家乡。
+                </div>
+            </div>
+            
+            <div class="quiz-container" id="quiz-container">
+                <div class="quiz-question" id="quiz-question">《静夜思》的作者是谁？</div>
+                <div class="quiz-options" id="quiz-options">
+                    <div class="quiz-option" data-answer="李白">李白</div>
+                    <div class="quiz-option" data-answer="杜甫">杜甫</div>
+                    <div class="quiz-option" data-answer="王维">王维</div>
+                    <div class="quiz-option" data-answer="白居易">白居易</div>
+                </div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+            
+            <div class="fill-blank-container" id="fill-blank-container">
+                <div class="fill-blank-poem" id="fill-blank-poem">
+                    床前明月光，疑是<span class="blank"><input type="text" data-answer="地上霜"></span>。<br>
+                    举头望明月，<span class="blank"><input type="text" data-answer="低头思故乡"></span>。
+                </div>
+                <div class="feedback" id="fill-feedback"></div>
+            </div>
+            
+            <div class="match-container" id="match-container">
+                <div class="match-items" id="match-items">
+                    <div class="match-item" data-group="1" data-pair="1">床前明月光</div>
+                    <div class="match-item" data-group="1" data-pair="2">疑是地上霜</div>
+                    <div class="match-item" data-group="2" data-pair="1">举头望明月</div>
+                    <div class="match-item" data-group="2" data-pair="2">低头思故乡</div>
+                </div>
+                <div class="feedback" id="match-feedback"></div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="score-display" id="score-display">得分: 0</div>
+                <div class="stars-container" id="stars-container">
+                    <div class="star">★</div>
+                    <div class="star">★</div>
+                    <div class="star">★</div>
+                    <div class="star">★</div>
+                    <div class="star">★</div>
+                </div>
+            </div>
+            
+            <div class="hint-container" id="hint-container"></div>
+            
+            <div class="controls">
+                <button class="control-btn" id="prev-btn">上一首</button>
+                <button class="control-btn" id="check-btn">检查答案</button>
+                <button class="control-btn" id="next-btn">下一首</button>
+            </div>
+            
+            <div class="student-picker">
+                <button class="control-btn" id="pick-student-btn">随机抽选学生</button>
+                <div class="student-list" id="student-list">
+                    <div class="student-item">小明</div>
+                    <div class="student-item">小红</div>
+                    <div class="student-item">小刚</div>
+                    <div class="student-item">小丽</div>
+                    <div class="student-item">小华</div>
+                    <div class="student-item">小芳</div>
+                    <div class="student-item">小强</div>
+                    <div class="student-item">小美</div>
+                    <div class="student-item">小杰</div>
+                    <div class="student-item">小燕</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 默认诗词数据
+        let poems = [
+            {
+                title: "静夜思",
+                author: "唐代 · 李白",
+                content: "床前明月光，疑是地上霜。\n举头望明月，低头思故乡。",
+                translation: "译文：床前明亮的月光，好像地上的一层霜。抬头望望那明月，低头想念我的家乡。",
+                questions: [
+                    {
+                        question: "《静夜思》的作者是谁？",
+                        options: ["李白", "杜甫", "王维", "白居易"],
+                        answer: "李白"
+                    },
+                    {
+                        question: "《静夜思》中'疑是地上霜'的'疑'字表达了什么？",
+                        options: ["怀疑", "猜测", "相似", "不确定"],
+                        answer: "猜测"
+                    },
+                    {
+                        question: "《静夜思》表达了作者怎样的情感？",
+                        options: ["思乡之情", "喜悦之情", "愤怒之情", "惊讶之情"],
+                        answer: "思乡之情"
+                    }
+                ],
+                blanks: [
+                    {
+                        text: "床前明月光，疑是_____。",
+                        answer: "地上霜"
+                    },
+                    {
+                        text: "举头望明月，_____。",
+                        answer: "低头思故乡"
+                    }
+                ],
+                pairs: [
+                    ["床前明月光", "疑是地上霜"],
+                    ["举头望明月", "低头思故乡"]
+                ]
+            },
+            {
+                title: "春晓",
+                author: "唐代 · 孟浩然",
+                content: "春眠不觉晓，处处闻啼鸟。\n夜来风雨声，花落知多少。",
+                translation: "译文：春天里睡觉，不知不觉天就亮了，到处可以听到鸟儿的叫声。夜里刮风下雨的声音很大，不知道有多少花儿被吹落了。",
+                questions: [
+                    {
+                        question: "《春晓》的作者是谁？",
+                        options: ["李白", "杜甫", "孟浩然", "王维"],
+                        answer: "孟浩然"
+                    },
+                    {
+                        question: "《春晓》中'春眠不觉晓'的'晓'是什么意思？",
+                        options: ["黎明", "傍晚", "中午", "深夜"],
+                        answer: "黎明"
+                    },
+                    {
+                        question: "《春晓》描写了哪个季节的景象？",
+                        options: ["春天", "夏天", "秋天", "冬天"],
+                        answer: "春天"
+                    }
+                ],
+                blanks: [
+                    {
+                        text: "春眠不觉晓，_____。",
+                        answer: "处处闻啼鸟"
+                    },
+                    {
+                        text: "夜来风雨声，_____。",
+                        answer: "花落知多少"
+                    }
+                ],
+                pairs: [
+                    ["春眠不觉晓", "处处闻啼鸟"],
+                    ["夜来风雨声", "花落知多少"]
+                ]
+            }
+        ];
+        
+        // 游戏状态
+        const gameState = {
+            currentPoemIndex: 0,
+            score: 0,
+            mode: 'explore',
+            learnedPoems: new Set(),
+            currentStreak: 0,
+            stars: 0,
+            selectedAnswer: null,
+            selectedMatchItems: []
+        };
+        
+        // DOM元素
+        const elements = {
+            poemDisplay: document.getElementById('poem-display'),
+            poemTitle: document.getElementById('poem-title'),
+            poemAuthor: document.getElementById('poem-author'),
+            poemContent: document.getElementById('poem-content'),
+            poemTranslation: document.getElementById('poem-translation'),
+            quizContainer: document.getElementById('quiz-container'),
+            quizQuestion: document.getElementById('quiz-question'),
+            quizOptions: document.getElementById('quiz-options'),
+            feedback: document.getElementById('feedback'),
+            fillBlankContainer: document.getElementById('fill-blank-container'),
+            fillBlankPoem: document.getElementById('fill-blank-poem'),
+            fillFeedback: document.getElementById('fill-feedback'),
+            matchContainer: document.getElementById('match-container'),
+            matchItems: document.getElementById('match-items'),
+            matchFeedback: document.getElementById('match-feedback'),
+            scoreDisplay: document.getElementById('score-display'),
+            progressBar: document.getElementById('progress-bar'),
+            hintContainer: document.getElementById('hint-container'),
+            starsContainer: document.getElementById('stars-container'),
+            studentList: document.getElementById('student-list')
+        };
+        
+        // 初始化游戏
+        function initGame() {
+            // 渲染第一首诗
+            renderCurrentPoem();
+            
+            // 更新进度条
+            updateProgressBar();
+            
+            // 添加事件监听器
+            addEventListeners();
+        }
+        
+        // 渲染当前诗词
+        function renderCurrentPoem() {
+            const currentPoem = poems[gameState.currentPoemIndex];
+            
+            // 更新诗词信息
+            elements.poemTitle.textContent = currentPoem.title;
+            elements.poemAuthor.textContent = currentPoem.author;
+            elements.poemContent.innerHTML = currentPoem.content.replace(/\n/g, '<br>');
+            elements.poemTranslation.textContent = currentPoem.translation;
+            
+            // 如果是测试模式，显示问题
+            if (gameState.mode === 'quiz') {
+                showQuiz();
+            } else if (gameState.mode === 'fill') {
+                showFillBlanks();
+            } else if (gameState.mode === 'match') {
+                showMatch();
+            }
+        }
+        
+        // 显示测验问题
+        function showQuiz() {
+            const currentPoem = poems[gameState.currentPoemIndex];
+            const randomQuestion = currentPoem.questions[Math.floor(Math.random() * currentPoem.questions.length)];
+            
+            elements.quizQuestion.textContent = randomQuestion.question;
+            
+            // 清空选项
+            elements.quizOptions.innerHTML = '';
+            
+            // 添加选项
+            randomQuestion.options.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'quiz-option';
+                optionElement.textContent = option;
+                optionElement.dataset.answer = option;
+                optionElement.addEventListener('click', selectOption);
+                elements.quizOptions.appendChild(optionElement);
+            });
+            
+            // 清空反馈
+            elements.feedback.textContent = '';
+            elements.feedback.className = 'feedback';
+            elements.feedback.style.display = 'none';
+            
+            // 重置选中的答案
+            gameState.selectedAnswer = null;
+        }
+        
+        // 显示填空题
+        function showFillBlanks() {
+            const currentPoem = poems[gameState.currentPoemIndex];
+            const blanks = currentPoem.blanks;
+            
+            // 清空填空区域
+            elements.fillBlankPoem.innerHTML = '';
+            
+            // 添加填空题
+            blanks.forEach(blank => {
+                const parts = blank.text.split('_____');
+                const blankHTML = `
+                    ${parts[0]}<span class="blank"><input type="text" data-answer="${blank.answer}"></span>${parts[1] || ''}
+                    <br>
+                `;
+                elements.fillBlankPoem.innerHTML += blankHTML;
+            });
+            
+            // 清空反馈
+            elements.fillFeedback.textContent = '';
+            elements.fillFeedback.className = 'feedback';
+            elements.fillFeedback.style.display = 'none';
+        }
+        
+        // 显示配对题
+        function showMatch() {
+            const currentPoem = poems[gameState.currentPoemIndex];
+            const pairs = currentPoem.pairs;
+            
+            // 清空配对区域
+            elements.matchItems.innerHTML = '';
+            
+            // 创建所有配对项并打乱顺序
+            const allItems = [];
+            pairs.forEach((pair, groupIndex) => {
+                pair.forEach((item, pairIndex) => {
+                    allItems.push({
+                        text: item,
+                        group: groupIndex + 1,
+                        pair: pairIndex + 1
+                    });
+                });
+            });
+            
+            // 打乱顺序
+            shuffleArray(allItems);
+            
+            // 添加配对项
+            allItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'match-item';
+                itemElement.textContent = item.text;
+                itemElement.dataset.group = item.group;
+                itemElement.dataset.pair = item.pair;
+                itemElement.addEventListener('click', selectMatchItem);
+                elements.matchItems.appendChild(itemElement);
+            });
+            
+            // 清空反馈
+            elements.matchFeedback.textContent = '';
+            elements.matchFeedback.className = 'feedback';
+            elements.matchFeedback.style.display = 'none';
+            
+            // 重置选中的配对项
+            gameState.selectedMatchItems = [];
+        }
+        
+        // 打乱数组顺序
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // 选择选项
+        function selectOption(event) {
+            // 移除之前选中的选项
+            const options = elements.quizOptions.querySelectorAll('.quiz-option');
+            options.forEach(option => option.classList.remove('selected'));
+            
+            // 选中当前选项
+            event.target.classList.add('selected');
+            
+            // 保存选中的答案
+            gameState.selectedAnswer = event.target.dataset.answer;
+        }
+        
+        // 选择配对项
+        function selectMatchItem(event) {
+            // 如果已经匹配成功，不做任何操作
+            if (event.target.classList.contains('matched')) {
+                return;
+            }
+            
+            // 如果已经选中两个项目，先取消选中
+            if (gameState.selectedMatchItems.length === 2) {
+                gameState.selectedMatchItems.forEach(item => {
+                    item.classList.remove('selected');
+                });
+                gameState.selectedMatchItems = [];
+            }
+            
+            // 选中当前项目
+            event.target.classList.add('selected');
+            gameState.selectedMatchItems.push(event.target);
+            
+            // 如果选中了两个项目，检查是否匹配
+            if (gameState.selectedMatchItems.length === 2) {
+                const item1 = gameState.selectedMatchItems[0];
+                const item2 = gameState.selectedMatchItems[1];
+                
+                // 检查是否属于同一组但不是同一对
+                if (item1.dataset.group === item2.dataset.group && item1.dataset.pair !== item2.dataset.pair) {
+                    // 匹配成功
+                    item1.classList.remove('selected');
+                    item2.classList.remove('selected');
+                    item1.classList.add('matched');
+                    item2.classList.add('matched');
+                    
+                    // 显示成功反馈
+                    elements.matchFeedback.textContent = '配对正确！';
+                    elements.matchFeedback.className = 'feedback correct';
+                    elements.matchFeedback.style.display = 'block';
+                    
+                    // 检查是否所有项目都已匹配
+                    const allMatched = Array.from(elements.matchItems.querySelectorAll('.match-item')).every(item => item.classList.contains('matched'));
+                    if (allMatched) {
+                        // 增加分数
+                        gameState.score += 10;
+                        elements.scoreDisplay.textContent = `得分: ${gameState.score}`;
+                        
+                        // 增加连续正确次数
+                        gameState.currentStreak++;
+                        
+                        // 如果连续正确3次，增加一颗星
+                        if (gameState.currentStreak % 3 === 0 && gameState.stars < 5) {
+                            addStar();
+                        }
+                        
+                        // 添加到已学习的诗词
+                        gameState.learnedPoems.add(gameState.currentPoemIndex);
+                        
+                        // 更新进度条
+                        updateProgressBar();
+                        
+                        // 显示提示
+                        showHint('太棒了！所有诗句都配对正确！');
+                        
+                        // 2秒后显示下一首诗
+                        setTimeout(() => {
+                            nextPoem();
+                        }, 2000);
+                    }
+                    
+                    // 清空选中的配对项
+                    gameState.selectedMatchItems = [];
+                } else {
+                    // 匹配失败，2秒后取消选中
+                    setTimeout(() => {
+                        item1.classList.remove('selected');
+                        item2.classList.remove('selected');
+                        gameState.selectedMatchItems = [];
+                        
+                        // 显示失败反馈
+                        elements.matchFeedback.textContent = '配对错误，请再试一次！';
+                        elements.matchFeedback.className = 'feedback incorrect';
+                        elements.matchFeedback.style.display = 'block';
+                    }, 1000);
+                }
+            }
+        }
+        
+        // 检查答案
+        function checkAnswer() {
+            let correctAnswer;
+            
+            if (gameState.mode === 'quiz') {
+                // 问答模式
+                const currentPoem = poems[gameState.currentPoemIndex];
+                const currentQuestion = elements.quizQuestion.textContent;
+                correctAnswer = currentPoem.questions.find(q => q.question === currentQuestion).answer;
+                
+                if (gameState.selectedAnswer === correctAnswer) {
+                    elements.feedback.textContent = '回答正确！';
+                    elements.feedback.className = 'feedback correct';
+                    elements.feedback.style.display = 'block';
+                    
+                    // 增加分数
+                    gameState.score += 10;
+                    elements.scoreDisplay.textContent = `得分: ${gameState.score}`;
+                    
+                    // 增加连续正确次数
+                    gameState.currentStreak++;
+                    
+                    // 如果连续正确3次，增加一颗星
+                    if (gameState.currentStreak % 3 === 0 && gameState.stars < 5) {
+                        addStar();
+                    }
+                    
+                    // 添加到已学习的诗词
+                    gameState.learnedPoems.add(gameState.currentPoemIndex);
+                    
+                    // 更新进度条
+                    updateProgressBar();
+                    
+                    // 显示提示
+                    showHint('太棒了！继续保持！');
+                    
+                    // 2秒后显示下一个问题或诗词
+                    setTimeout(() => {
+                        if (Math.random() > 0.5) {
+                            showQuiz();
+                        } else {
+                            nextPoem();
+                        }
+                    }, 2000);
+                } else {
+                    elements.feedback.textContent = `回答错误！正确答案是: ${correctAnswer}`;
+                    elements.feedback.className = 'feedback incorrect';
+                    elements.feedback.style.display = 'block';
+                    
+                    // 重置连续正确次数
+                    gameState.currentStreak = 0;
+                    
+                    // 显示提示
+                    showHint('再试一次，你可以的！');
+                }
+            } else if (gameState.mode === 'fill') {
+                // 填空模式
+                const inputs = elements.fillBlankPoem.querySelectorAll('input');
+                let allCorrect = true;
+                
+                inputs.forEach(input => {
+                    const userAnswer = input.value.trim();
+                    const correctAnswer = input.dataset.answer;
+                    
+                    if (userAnswer === correctAnswer) {
+                        input.style.color = 'green';
+                    } else {
+                        input.style.color = 'red';
+                        input.value = correctAnswer;
+                        allCorrect = false;
+                    }
+                });
+                
+                if (allCorrect) {
+                    elements.fillFeedback.textContent = '所有填空都正确！';
+                    elements.fillFeedback.className = 'feedback correct';
+                    elements.fillFeedback.style.display = 'block';
+                    
+                    // 增加分数
+                    gameState.score += 10;
+                    elements.scoreDisplay.textContent = `得分: ${gameState.score}`;
+                    
+                    // 增加连续正确次数
+                    gameState.currentStreak++;
+                    
+                    // 如果连续正确3次，增加一颗星
+                    if (gameState.currentStreak % 3 === 0 && gameState.stars < 5) {
+                        addStar();
+                    }
+                    
+                    // 添加到已学习的诗词
+                    gameState.learnedPoems.add(gameState.currentPoemIndex);
+                    
+                    // 更新进度条
+                    updateProgressBar();
+                    
+                    // 显示提示
+                    showHint('太棒了！继续保持！');
+                    
+                    // 2秒后显示下一首诗
+                    setTimeout(() => {
+                        nextPoem();
+                    }, 2000);
+                } else {
+                    elements.fillFeedback.textContent = '有些填空不正确，已显示正确答案';
+                    elements.fillFeedback.className = 'feedback incorrect';
+                    elements.fillFeedback.style.display = 'block';
+                    
+                    // 重置连续正确次数
+                    gameState.currentStreak = 0;
+                    
+                    // 显示提示
+                    showHint('再试一次，你可以的！');
+                }
+            }
+        }
+        
+        // 添加星星
+        function addStar() {
+            if (gameState.stars < 5) {
+                const stars = elements.starsContainer.querySelectorAll('.star');
+                stars[gameState.stars].classList.add('earned');
+                gameState.stars++;
+                
+                // 显示庆祝效果
+                showCelebration();
+            }
+        }
+        
+        // 显示庆祝效果
+        function showCelebration() {
+            // 创建庆祝元素
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+            celebration.style.position = 'fixed';
+            celebration.style.top = '0';
+            celebration.style.left = '0';
+            celebration.style.width = '100%';
+            celebration.style.height = '100%';
+            celebration.style.pointerEvents = 'none';
+            celebration.style.zIndex = '1000';
+            
+            // 添加五彩纸屑
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'absolute';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = getRandomColor();
+                confetti.style.borderRadius = '50%';
+                confetti.style.top = '0';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.transform = 'translateY(0)';
+                confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear`;
+                
+                celebration.appendChild(confetti);
+            }
+            
+            document.body.appendChild(celebration);
+            
+            // 2秒后移除庆祝效果
+            setTimeout(() => {
+                document.body.removeChild(celebration);
+            }, 2000);
+        }
+        
+        // 获取随机颜色
+        function getRandomColor() {
+            const colors = ['#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE', '#448AFF', '#40C4FF', '#18FFFF', '#64FFDA', '#69F0AE', '#B2FF59', '#EEFF41', '#FFFF00', '#FFD740', '#FFAB40', '#FF6E40'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        // 显示提示
+        function showHint(message) {
+            elements.hintContainer.textContent = message;
+            elements.hintContainer.style.animation = 'fadeIn 0.5s';
+            
+            // 2秒后隐藏提示
+            setTimeout(() => {
+                elements.hintContainer.style.animation = 'fadeOut 0.5s';
+                setTimeout(() => {
+                    elements.hintContainer.textContent = '';
+                }, 500);
+            }, 2000);
+        }
+        
+        // 更新进度条
+        function updateProgressBar() {
+            const progress = (gameState.learnedPoems.size / poems.length) * 100;
+            elements.progressBar.style.width = `${progress}%`;
+        }
+        
+        // 随机抽选学生
+        function pickRandomStudent() {
+            // 移除之前选中的学生
+            const studentItems = elements.studentList.querySelectorAll('.student-item');
+            studentItems.forEach(item => item.classList.remove('selected'));
+            
+            // 随机选择一个学生
+            const randomIndex = Math.floor(Math.random() * studentItems.length);
+            studentItems[randomIndex].classList.add('selected');
+            
+            // 显示提示
+            showHint(`请 ${studentItems[randomIndex].textContent} 回答问题`);
+        }
+        
+        // 切换模式
+        function switchMode(mode) {
+            gameState.mode = mode;
+            
+            // 更新按钮状态
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            modeButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.mode === mode) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // 根据模式更新界面
+            elements.poemDisplay.style.display = mode === 'explore' ? 'block' : 'none';
+            elements.quizContainer.style.display = mode === 'quiz' ? 'block' : 'none';
+            elements.fillBlankContainer.style.display = mode === 'fill' ? 'block' : 'none';
+            elements.matchContainer.style.display = mode === 'match' ? 'block' : 'none';
+            
+            // 检查按钮只在问答和填空模式显示
+            document.getElementById('check-btn').style.display = (mode === 'quiz' || mode === 'fill') ? 'inline-block' : 'none';
+            
+            // 根据模式渲染内容
+            if (mode === 'quiz') {
+                showQuiz();
+            } else if (mode === 'fill') {
+                showFillBlanks();
+            } else if (mode === 'match') {
+                showMatch();
+            } else {
+                renderCurrentPoem();
+            }
+        }
+        
+        // 下一首诗
+        function nextPoem() {
+            gameState.currentPoemIndex = (gameState.currentPoemIndex + 1) % poems.length;
+            renderCurrentPoem();
+        }
+        
+        // 上一首诗
+        function prevPoem() {
+            gameState.currentPoemIndex = (gameState.currentPoemIndex - 1 + poems.length) % poems.length;
+            renderCurrentPoem();
+        }
+        
+        // 添加事件监听器
+        function addEventListeners() {
+            // 模式切换按钮
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+            });
+            
+            // 上一个按钮
+            document.getElementById('prev-btn').addEventListener('click', prevPoem);
+            
+            // 下一个按钮
+            document.getElementById('next-btn').addEventListener('click', nextPoem);
+            
+            // 检查答案按钮
+            document.getElementById('check-btn').addEventListener('click', checkAnswer);
+            
+            // 抽选学生按钮
+            document.getElementById('pick-student-btn').addEventListener('click', pickRandomStudent);
+            
+            // JSON文件上传
+            document.getElementById('json-upload').addEventListener('change', handleFileUpload);
+        }
+        
+        // 处理文件上传
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    
+                    // 验证JSON格式是否正确
+                    if (Array.isArray(jsonData) && jsonData.length > 0) {
+                        // 检查每个诗词对象是否包含必要的字段
+                        const isValid = jsonData.every(poem => 
+                            poem.title && poem.author && poem.content && 
+                            (poem.questions || poem.blanks || poem.pairs)
+                        );
+                        
+                        if (isValid) {
+                            poems = jsonData;
+                            gameState.currentPoemIndex = 0;
+                            gameState.learnedPoems = new Set();
+                            updateProgressBar();
+                            renderCurrentPoem();
+                            showHint('诗词数据加载成功！');
+                        } else {
+                            showHint('JSON格式不正确，请检查数据结构！');
+                        }
+                    } else {
+                        showHint('JSON格式不正确，应为诗词对象数组！');
+                    }
+                } catch (error) {
+                    showHint('JSON解析错误，请检查文件格式！');
+                    console.error('JSON解析错误:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // 启动游戏
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>

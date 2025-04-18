@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>篮球比赛管理系统</title>
+    <link href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.org/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .sidebar {
+            width: 250px;
+            transition: all 0.3s;
+        }
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s;
+        }
+        .card {
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .dark-mode .card {
+            background-color: #2d2d2d;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- 登录检查 -->
+    <script>
+        // 检查是否已登录
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'basketball_frontend.html';
+        }
+    </script>
+
+    <!-- 侧边栏 -->
+    <div class="sidebar fixed h-full bg-blue-800 text-white">
+        <div class="p-4">
+            <h1 class="text-2xl font-bold mb-8">篮球比赛管理系统</h1>
+            <nav>
+                <ul class="space-y-4">
+                    <li>
+                        <a href="#teams" class="flex items-center p-2 hover:bg-blue-700 rounded-lg">
+                            <i class="fas fa-users mr-2"></i>
+                            球队管理
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#matches" class="flex items-center p-2 hover:bg-blue-700 rounded-lg">
+                            <i class="fas fa-basketball-ball mr-2"></i>
+                            比赛管理
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#players" class="flex items-center p-2 hover:bg-blue-700 rounded-lg">
+                            <i class="fas fa-user mr-2"></i>
+                            球员管理
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#stats" class="flex items-center p-2 hover:bg-blue-700 rounded-lg">
+                            <i class="fas fa-chart-bar mr-2"></i>
+                            数据统计
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#settings" class="flex items-center p-2 hover:bg-blue-700 rounded-lg">
+                            <i class="fas fa-cog mr-2"></i>
+                            系统设置
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content p-8">
+        <!-- 顶部工具栏 -->
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold">管理控制台</h2>
+            <div class="flex items-center space-x-4">
+                <button id="darkModeToggle" class="p-2 rounded-lg bg-gray-200 hover:bg-gray-300">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="p-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i> 刷新数据
+                </button>
+                <button class="p-2 rounded-lg bg-red-500 text-white hover:bg-red-600" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> 退出登录
+                </button>
+            </div>
+        </div>
+
+        <!-- 球队管理 -->
+        <div id="teams" class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-semibold">球队管理</h3>
+                <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" onclick="showAddTeamModal()">
+                    <i class="fas fa-plus mr-2"></i>添加球队
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="teamsContainer">
+                <!-- 球队卡片将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 添加球队模态框 -->
+        <div id="addTeamModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+            <div class="flex items-center justify-center min-h-screen">
+                <div class="bg-white p-8 rounded-lg shadow-xl w-96">
+                    <h2 class="text-2xl font-bold mb-6 text-center">添加球队</h2>
+                    <form id="addTeamForm">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="teamName">
+                                球队名称
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                   id="teamName" type="text" placeholder="请输入球队名称">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="teamCity">
+                                所在城市
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                   id="teamCity" type="text" placeholder="请输入所在城市">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="teamLogo">
+                                球队Logo URL
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                   id="teamLogo" type="text" placeholder="请输入球队Logo URL">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
+                                    type="submit">
+                                添加
+                            </button>
+                            <button type="button" onclick="closeAddTeamModal()" 
+                                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                取消
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 比赛管理 -->
+        <div id="matches" class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-semibold">比赛管理</h3>
+                <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" onclick="showAddMatchModal()">
+                    <i class="fas fa-plus mr-2"></i>添加比赛
+                </button>
+            </div>
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">比赛时间</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">主队</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">客队</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">比分</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="matchesContainer">
+                        <!-- 比赛数据将通过JavaScript动态生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 添加比赛模态框 -->
+        <div id="addMatchModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+            <div class="flex items-center justify-center min-h-screen">
+                <div class="bg-white p-8 rounded-lg shadow-xl w-96">
+                    <h2 class="text-2xl font-bold mb-6 text-center">添加比赛</h2>
+                    <form id="addMatchForm">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="matchDate">
+                                比赛日期
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                   id="matchDate" type="date" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="matchTime">
+                                比赛时间
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                   id="matchTime" type="time" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="homeTeam">
+                                主队
+                            </label>
+                            <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                    id="homeTeam" required>
+                                <!-- 球队选项将通过JavaScript动态生成 -->
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="awayTeam">
+                                客队
+                            </label>
+                            <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                    id="awayTeam" required>
+                                <!-- 球队选项将通过JavaScript动态生成 -->
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="streamUrl">
+                                直播源视频号链接
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                   id="streamUrl" type="text" placeholder="请输入直播源视频号链接">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
+                                    type="submit">
+                                添加
+                            </button>
+                            <button type="button" onclick="closeAddMatchModal()" 
+                                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                取消
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 球员管理 -->
+        <div id="players" class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-semibold">球员管理</h3>
+                <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" onclick="showAddPlayerModal()">
+                    <i class="fas fa-plus mr-2"></i>添加球员
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="playersContainer">
+                <!-- 球员卡片将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 添加球员模态框 -->
+        <div id="addPlayerModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+            <div class="flex items-center justify-center min-h-screen">
+                <div class="bg-white p-8 rounded-lg shadow-xl w-96">
+                    <h2 class="text-2xl font-bold mb-6 text-center">添加球员</h2>
+                    <form id="addPlayerForm">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="playerName">
+                                球员姓名
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                   id="playerName" type="text" placeholder="请输入球员姓名" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="playerTeam">
+                                所属球队
+                            </label>
+                            <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                    id="playerTeam" required>
+                                <!-- 球队选项将通过JavaScript动态生成 -->
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="playerNumber">
+                                球衣号码
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                   id="playerNumber" type="number" placeholder="请输入球衣号码" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="playerPosition">
+                                场上位置
+                            </label>
+                            <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                    id="playerPosition" required>
+                                <option value="PG">控球后卫</option>
+                                <option value="SG">得分后卫</option>
+                                <option value="SF">小前锋</option>
+                                <option value="PF">大前锋</option>
+                                <option value="C">中锋</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
+                                    type="submit">
+                                添加
+                            </button>
+                            <button type="button" onclick="closeAddPlayerModal()" 
+                                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                取消
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据统计 -->
+        <div id="stats" class="mb-8">
+            <h3 class="text-2xl font-semibold mb-4">数据统计</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card bg-white p-4 rounded-lg shadow-lg">
+                    <h4 class="text-lg font-semibold mb-2">得分榜</h4>
+                    <div class="space-y-2" id="scoringLeaders">
+                        <!-- 得分数据将通过JavaScript动态加载 -->
+                    </div>
+                </div>
+                <div class="card bg-white p-4 rounded-lg shadow-lg">
+                    <h4 class="text-lg font-semibold mb-2">犯规榜</h4>
+                    <div class="space-y-2" id="foulLeaders">
+                        <!-- 犯规数据将通过JavaScript动态加载 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系统设置 -->
+        <div id="settings" class="mb-8">
+            <h3 class="text-2xl font-semibold mb-4">系统设置</h3>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">赛季设置</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="输入赛季名称">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">数据更新频率</label>
+                        <select class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            <option>实时更新</option>
+                            <option>每5分钟</option>
+                            <option>每15分钟</option>
+                            <option>每30分钟</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">数据备份</label>
+                        <button class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                            <i class="fas fa-download mr-2"></i>备份数据
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 球队数据统计 -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">球队数据统计</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">球队</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">总得分</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">犯规次数</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">积分</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">排名</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="teamStats">
+                        <!-- 球队数据将通过JavaScript动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储
+        let teams = JSON.parse(localStorage.getItem('teams')) || [];
+        let matches = JSON.parse(localStorage.getItem('matches')) || [];
+        let players = JSON.parse(localStorage.getItem('players')) || [];
+
+        // 登出功能
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'basketball_frontend.html';
+        }
+
+        // 刷新数据
+        function refreshData() {
+            loadTeams();
+            loadMatches();
+            loadPlayers();
+            loadTeamStats();
+        }
+
+        // 球队管理相关函数
+        function showAddTeamModal() {
+            document.getElementById('addTeamModal').classList.remove('hidden');
+        }
+
+        function closeAddTeamModal() {
+            document.getElementById('addTeamModal').classList.add('hidden');
+            document.getElementById('addTeamForm').reset();
+        }
+
+        function loadTeams() {
+            const container = document.getElementById('teamsContainer');
+            container.innerHTML = '';
+            teams.forEach(team => {
+                const teamCard = `
+                    <div class="card bg-white p-4 rounded-lg shadow-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-semibold">${team.name}</h4>
+                            <div class="flex space-x-2">
+                                <button onclick="editTeam('${team.id}')" class="text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteTeam('${team.id}')" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <p><i class="fas fa-map-marker-alt mr-2"></i>${team.city}</p>
+                            <p><i class="fas fa-users mr-2"></i>${team.playerCount || 0}名球员</p>
+                            <p><i class="fas fa-trophy mr-2"></i>${team.championships || 0}次总冠军</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += teamCard;
+            });
+        }
+
+        function deleteTeam(teamId) {
+            if (confirm('确定要删除这个球队吗？')) {
+                teams = teams.filter(team => team.id !== teamId);
+                localStorage.setItem('teams', JSON.stringify(teams));
+                loadTeams();
+            }
+        }
+
+        // 比赛管理相关函数
+        function showAddMatchModal() {
+            const homeTeamSelect = document.getElementById('homeTeam');
+            const awayTeamSelect = document.getElementById('awayTeam');
+            homeTeamSelect.innerHTML = '';
+            awayTeamSelect.innerHTML = '';
+            
+            teams.forEach(team => {
+                homeTeamSelect.innerHTML += `<option value="${team.name}">${team.name}</option>`;
+                awayTeamSelect.innerHTML += `<option value="${team.name}">${team.name}</option>`;
+            });
+            
+            document.getElementById('addMatchModal').classList.remove('hidden');
+        }
+
+        function closeAddMatchModal() {
+            document.getElementById('addMatchModal').classList.add('hidden');
+            document.getElementById('addMatchForm').reset();
+        }
+
+        function loadMatches() {
+            const container = document.getElementById('matchesContainer');
+            container.innerHTML = '';
+            matches.forEach(match => {
+                container.innerHTML += `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">${match.date} ${match.time}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${match.homeTeam}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${match.awayTeam}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${match.homeScore}-${match.awayScore}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button onclick="editMatch('${match.id}')" class="text-blue-500 hover:text-blue-700 mr-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteMatch('${match.id}')" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteMatch(matchId) {
+            if (confirm('确定要删除这场比赛吗？')) {
+                matches = matches.filter(match => match.id !== matchId);
+                localStorage.setItem('matches', JSON.stringify(matches));
+                loadMatches();
+            }
+        }
+
+        // 球员管理相关函数
+        function showAddPlayerModal() {
+            const teamSelect = document.getElementById('playerTeam');
+            teamSelect.innerHTML = '';
+            
+            teams.forEach(team => {
+                teamSelect.innerHTML += `<option value="${team.name}">${team.name}</option>`;
+            });
+            
+            document.getElementById('addPlayerModal').classList.remove('hidden');
+        }
+
+        function closeAddPlayerModal() {
+            document.getElementById('addPlayerModal').classList.add('hidden');
+            document.getElementById('addPlayerForm').reset();
+        }
+
+        function loadPlayers() {
+            const container = document.getElementById('playersContainer');
+            container.innerHTML = '';
+            players.forEach(player => {
+                container.innerHTML += `
+                    <div class="card bg-white p-4 rounded-lg shadow-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-semibold">${player.name}</h4>
+                            <div class="flex space-x-2">
+                                <button onclick="editPlayer('${player.id}')" class="text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deletePlayer('${player.id}')" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <p><i class="fas fa-tshirt mr-2"></i>${player.number}号</p>
+                            <p><i class="fas fa-basketball-ball mr-2"></i>${player.position}</p>
+                            <p><i class="fas fa-users mr-2"></i>${player.team}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function deletePlayer(playerId) {
+            if (confirm('确定要删除这个球员吗？')) {
+                players = players.filter(player => player.id !== playerId);
+                localStorage.setItem('players', JSON.stringify(players));
+                loadPlayers();
+            }
+        }
+
+        // 表单提交事件监听
+        document.getElementById('addTeamForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const team = {
+                id: Date.now().toString(),
+                name: document.getElementById('teamName').value,
+                city: document.getElementById('teamCity').value,
+                logo: document.getElementById('teamLogo').value,
+                playerCount: 0,
+                championships: 0
+            };
+            teams.push(team);
+            localStorage.setItem('teams', JSON.stringify(teams));
+            closeAddTeamModal();
+            loadTeams();
+        });
+
+        document.getElementById('addMatchForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const team1Id = document.getElementById('homeTeam').value;
+            const team2Id = document.getElementById('awayTeam').value;
+            const date = document.getElementById('matchDate').value;
+            const time = document.getElementById('matchTime').value;
+            const streamUrl = document.getElementById('streamUrl').value;
+            
+            const matches = JSON.parse(localStorage.getItem('matches')) || [];
+            matches.push({
+                id: Date.now().toString(),
+                team1Id,
+                team2Id,
+                date,
+                time,
+                status: '未开始',
+                score1: 0,
+                score2: 0,
+                fouls1: 0,
+                fouls2: 0,
+                streamUrl
+            });
+            
+            localStorage.setItem('matches', JSON.stringify(matches));
+            loadMatches();
+            closeModal('addMatchModal');
+        });
+
+        document.getElementById('addPlayerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const player = {
+                id: Date.now().toString(),
+                name: document.getElementById('playerName').value,
+                team: document.getElementById('playerTeam').value,
+                number: document.getElementById('playerNumber').value,
+                position: document.getElementById('playerPosition').value,
+                points: 0,
+                rebounds: 0,
+                assists: 0,
+                steals: 0
+            };
+            players.push(player);
+            localStorage.setItem('players', JSON.stringify(players));
+            closeAddPlayerModal();
+            loadPlayers();
+        });
+
+        // 深色模式切换
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const icon = darkModeToggle.querySelector('i');
+            if (body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+
+        // 检查系统主题设置
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            body.classList.add('dark-mode');
+            darkModeToggle.querySelector('i').classList.remove('fa-moon');
+            darkModeToggle.querySelector('i').classList.add('fa-sun');
+        }
+
+        // 初始化加载数据
+        refreshData();
+
+        function loadTeamStats() {
+            const teams = JSON.parse(localStorage.getItem('teams')) || [];
+            const matches = JSON.parse(localStorage.getItem('matches')) || [];
+            
+            // 计算每个球队的统计数据
+            const teamStats = teams.map(team => {
+                const teamMatches = matches.filter(match => match.team1Id === team.id || match.team2Id === team.id);
+                const totalPoints = teamMatches.reduce((sum, match) => {
+                    if (match.team1Id === team.id) return sum + (match.score1 || 0);
+                    if (match.team2Id === team.id) return sum + (match.score2 || 0);
+                    return sum;
+                }, 0);
+                
+                const totalFouls = teamMatches.reduce((sum, match) => {
+                    if (match.team1Id === team.id) return sum + (match.fouls1 || 0);
+                    if (match.team2Id === team.id) return sum + (match.fouls2 || 0);
+                    return sum;
+                }, 0);
+                
+                const points = teamMatches.reduce((sum, match) => {
+                    if (match.team1Id === team.id) {
+                        if (match.score1 > match.score2) return sum + 3;
+                        if (match.score1 === match.score2) return sum + 1;
+                    }
+                    if (match.team2Id === team.id) {
+                        if (match.score2 > match.score1) return sum + 3;
+                        if (match.score2 === match.score1) return sum + 1;
+                    }
+                    return sum;
+                }, 0);
+                
+                return {
+                    ...team,
+                    totalPoints,
+                    totalFouls,
+                    points
+                };
+            });
+            
+            // 按积分排序
+            teamStats.sort((a, b) => b.points - a.points);
+            
+            // 更新表格
+            const teamStatsContainer = document.getElementById('teamStats');
+            teamStatsContainer.innerHTML = '';
+            teamStats.forEach((team, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${team.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${team.totalPoints}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${team.totalFouls}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${team.points}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${index + 1}</td>
+                `;
+                teamStatsContainer.appendChild(row);
+            });
+        }
+
+        // 修改更新比赛状态的函数
+        function updateMatchStatus(matchId, status) {
+            const matches = JSON.parse(localStorage.getItem('matches')) || [];
+            const matchIndex = matches.findIndex(m => m.id === matchId);
+            if (matchIndex !== -1) {
+                matches[matchIndex].status = status;
+                localStorage.setItem('matches', JSON.stringify(matches));
+                loadMatches();
+            }
+        }
+
+        // 修改更新比赛得分的函数
+        function updateMatchScore(matchId, team, points) {
+            const matches = JSON.parse(localStorage.getItem('matches')) || [];
+            const matchIndex = matches.findIndex(m => m.id === matchId);
+            if (matchIndex !== -1) {
+                if (team === 'team1') {
+                    matches[matchIndex].score1 = points;
+                } else {
+                    matches[matchIndex].score2 = points;
+                }
+                localStorage.setItem('matches', JSON.stringify(matches));
+                loadMatches();
+            }
+        }
+
+        // 修改更新比赛犯规的函数
+        function updateMatchFouls(matchId, team, fouls) {
+            const matches = JSON.parse(localStorage.getItem('matches')) || [];
+            const matchIndex = matches.findIndex(m => m.id === matchId);
+            if (matchIndex !== -1) {
+                if (team === 'team1') {
+                    matches[matchIndex].fouls1 = fouls;
+                } else {
+                    matches[matchIndex].fouls2 = fouls;
+                }
+                localStorage.setItem('matches', JSON.stringify(matches));
+                loadMatches();
+            }
+        }
+
+        // 在页面加载时加载所有数据
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTeams();
+            loadMatches();
+            loadPlayers();
+            loadTeamStats();
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公众号封面生成器</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #f8fafc;
+            --auxiliary-color: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 2rem;
+        }
+
+        .cover-container {
+            display: flex;
+            gap: 0;
+        }
+
+        .wide-cover {
+            width: 1200px;
+            height: 510px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            padding: 3rem;
+        }
+
+        .square-cover {
+            width: 510px;
+            height: 510px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .title-area {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .title-first {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            white-space: nowrap;
+            letter-spacing: -0.02em;
+        }
+
+        .title-second {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            white-space: nowrap;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .features {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-left: 2rem;
+        }
+
+        .feature-card {
+            background: var(--auxiliary-color);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .feature-icon {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+
+        .glow {
+            position: absolute;
+            width: 9rem;
+            height: 9rem;
+            background: var(--primary-color);
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+        }
+
+        .glow-1 {
+            top: -2rem;
+            left: -2rem;
+        }
+
+        .glow-2 {
+            bottom: -2rem;
+            right: -2rem;
+        }
+
+        .noise {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.5"/></filter><rect width="100%" height="100%" filter="url(%23noise)"/></svg>');
+            opacity: 0.03;
+            mix-blend-mode: overlay;
+        }
+
+        .square-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .square-first {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .square-second {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.75rem 2rem;
+            border-radius: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="cover-container">
+        <!-- 宽版图 -->
+        <div class="wide-cover">
+            <div class="glow glow-1"></div>
+            <div class="glow glow-2"></div>
+            <div class="noise"></div>
+            
+            <div class="title-area">
+                <div class="title-first">零基础入门</div>
+                <div class="title-second">AI语音解读网站搭建</div>
+            </div>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <span class="feature-icon">🎯</span>
+                    <span>10分钟快速搭建</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🎨</span>
+                    <span>无需编程基础</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🚀</span>
+                    <span>一键部署分享</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 转发图 -->
+        <div class="square-cover">
+            <div class="glow glow-1"></div>
+            <div class="glow glow-2"></div>
+            <div class="noise"></div>
+            
+            <div class="square-title">
+                <div class="square-first">零基础</div>
+                <div class="square-second">搞定AI网站</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天骄世家篮球数据统计</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+    <!-- 导航栏 -->
+    <nav class="bg-white dark:bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold text-gray-800 dark:text-white">天骄世家篮球数据统计</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="darkModeToggle" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <i class="fas fa-moon text-gray-600 dark:text-gray-300"></i>
+                    </button>
+                    <button id="refreshBtn" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <i class="fas fa-sync-alt text-gray-600 dark:text-gray-300"></i>
+                    </button>
+                    <button id="adminBtn" class="p-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white">
+                        后台管理
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 标题部分 -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">天骄世家 2025赛季</h2>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">实时数据统计与比赛追踪</p>
+        </div>
+
+        <!-- 数据统计部分 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- 得分榜 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">得分榜</h3>
+                <div id="scoringLeaders" class="space-y-4"></div>
+            </div>
+
+            <!-- 篮板榜 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">篮板榜</h3>
+                <div id="reboundLeaders" class="space-y-4"></div>
+            </div>
+
+            <!-- 助攻榜 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">助攻榜</h3>
+                <div id="assistLeaders" class="space-y-4"></div>
+            </div>
+
+            <!-- 赛季数据 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">赛季数据</h3>
+                <div id="seasonStats" class="space-y-4"></div>
+            </div>
+        </div>
+
+        <!-- 比赛日程表 -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">比赛日程</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="border-b dark:border-gray-700">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">日期</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">主队</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">比分</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">客队</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white dark:bg-gray-800 shadow-lg mt-8">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 dark:text-gray-400">© 2025 天骄世家篮球. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- 登录模态框 -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-sm w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">管理员登录</h3>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="username">
+                        用户名
+                    </label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="username" type="text" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="password">
+                        密码
+                    </label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="password" type="password" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                        登录
+                    </button>
+                    <button type="button" id="cancelLogin" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                        取消
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 数据加载函数
+        function loadData() {
+            fetch('/api/teams')
+                .then(response => response.json())
+                .then(teams => {
+                    // 处理球队数据
+                });
+
+            fetch('/api/players')
+                .then(response => response.json())
+                .then(players => {
+                    // 更新得分榜
+                    const scoringLeaders = document.getElementById('scoringLeaders');
+                    const topScorers = players.sort((a, b) => b.points - a.points).slice(0, 3);
+                    scoringLeaders.innerHTML = topScorers.map((player, index) => `
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600 dark:text-gray-400">${index + 1}. ${player.name}</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">${player.points}分</span>
+                        </div>
+                    `).join('');
+
+                    // 更新篮板榜
+                    const reboundLeaders = document.getElementById('reboundLeaders');
+                    const topRebounders = players.sort((a, b) => b.rebounds - a.rebounds).slice(0, 3);
+                    reboundLeaders.innerHTML = topRebounders.map((player, index) => `
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600 dark:text-gray-400">${index + 1}. ${player.name}</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">${player.rebounds}个</span>
+                        </div>
+                    `).join('');
+
+                    // 更新助攻榜
+                    const assistLeaders = document.getElementById('assistLeaders');
+                    const topAssisters = players.sort((a, b) => b.assists - a.assists).slice(0, 3);
+                    assistLeaders.innerHTML = topAssisters.map((player, index) => `
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600 dark:text-gray-400">${index + 1}. ${player.name}</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">${player.assists}次</span>
+                        </div>
+                    `).join('');
+                });
+
+            fetch('/api/matches')
+                .then(response => response.json())
+                .then(matches => {
+                    const scheduleBody = document.getElementById('scheduleBody');
+                    scheduleBody.innerHTML = matches.map(match => `
+                        <tr class="border-b dark:border-gray-700">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${new Date(match.date).toLocaleDateString()}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${match.team1_name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${match.team1_score} - ${match.team2_score}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${match.team2_name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                ${match.status === 'ongoing' 
+                                    ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">进行中</span>'
+                                    : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">未开始</span>'
+                                }
+                            </td>
+                        </tr>
+                    `).join('');
+                });
+        }
+
+        // 页面加载完成后加载数据
+        document.addEventListener('DOMContentLoaded', loadData);
+
+        // 刷新按钮点击事件
+        document.getElementById('refreshBtn').addEventListener('click', loadData);
+
+        // 后台管理按钮点击事件
+        document.getElementById('adminBtn').addEventListener('click', () => {
+            document.getElementById('loginModal').classList.remove('hidden');
+        });
+
+        // 取消登录按钮点击事件
+        document.getElementById('cancelLogin').addEventListener('click', () => {
+            document.getElementById('loginModal').classList.add('hidden');
+        });
+
+        // 登录表单提交事件
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === 'admin' && password === 'admin123') {
+                localStorage.setItem('isLoggedIn', 'true');
+                window.location.href = '/admin';
+            } else {
+                alert('用户名或密码错误');
+            }
+        });
+
+        // 暗黑模式切换
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const html = document.documentElement;
+
+        // 检查系统主题偏好
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            html.classList.add('dark');
+        }
+
+        // 检查本地存储中的主题设置
+        if (localStorage.getItem('darkMode') === 'true') {
+            html.classList.add('dark');
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('darkMode', html.classList.contains('dark'));
+        });
+    </script>
+</body>
+</html> 

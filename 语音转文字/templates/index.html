@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whisper 语音转文字</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            min-height: 100px;
+        }
+        .loading {
+            text-align: center;
+            display: none;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .error {
+            color: #e74c3c;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Whisper 语音转文字</h1>
+        
+        <div class="form-group">
+            <label for="model">选择模型:</label>
+            <select id="model">
+                <option value="tiny">tiny - 最小 (速度最快，精度最低)</option>
+                <option value="base" selected>base - 基础 (速度快，精度一般)</option>
+                <option value="small">small - 小型 (速度和精度平衡)</option>
+                <option value="medium">medium - 中型 (速度较慢，精度较高)</option>
+                <option value="large">large - 大型 (速度最慢，精度最高)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="audio">选择音频文件:</label>
+            <input type="file" id="audio" accept="audio/*">
+        </div>
+        
+        <button id="transcribe-btn">开始转录</button>
+        
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>正在处理，请稍候...</p>
+        </div>
+        
+        <div class="error" id="error-message"></div>
+        
+        <div class="result">
+            <h3>转录结果:</h3>
+            <div id="result-text">等待转录...</div>
+            <div class="info" id="timing-info"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const transcribeBtn = document.getElementById('transcribe-btn');
+            const audioInput = document.getElementById('audio');
+            const modelSelect = document.getElementById('model');
+            const resultText = document.getElementById('result-text');
+            const timingInfo = document.getElementById('timing-info');
+            const loading = document.querySelector('.loading');
+            const errorMessage = document.getElementById('error-message');
+            
+            // 检查文件选择状态
+            audioInput.addEventListener('change', function() {
+                transcribeBtn.disabled = !this.files.length;
+            });
+            
+            // 初始状态
+            transcribeBtn.disabled = true;
+            
+            // 转录按钮点击事件
+            transcribeBtn.addEventListener('click', function() {
+                if (!audioInput.files.length) {
+                    showError('请选择音频文件');
+                    return;
+                }
+                
+                const file = audioInput.files[0];
+                const model = modelSelect.value;
+                
+                // 准备表单数据
+                const formData = new FormData();
+                formData.append('audio', file);
+                formData.append('model', model);
+                
+                // 显示加载状态
+                loading.style.display = 'block';
+                resultText.textContent = '正在转录...';
+                timingInfo.textContent = '';
+                errorMessage.style.display = 'none';
+                transcribeBtn.disabled = true;
+                
+                // 发送请求
+                fetch('/transcribe', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.error || '转录失败');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    resultText.textContent = data.text;
+                    timingInfo.textContent = `模型加载: ${data.load_time} | 转录时间: ${data.transcribe_time}`;
+                })
+                .catch(error => {
+                    showError(error.message);
+                    resultText.textContent = '转录失败';
+                })
+                .finally(() => {
+                    loading.style.display = 'none';
+                    transcribeBtn.disabled = false;
+                });
+            });
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

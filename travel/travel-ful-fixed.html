@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>重庆三日游</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #e62129;
+            --secondary-color: #333;
+            --accent-color: #f8d568;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --font-primary: 'Noto Serif SC', serif;
+            --font-secondary: 'Noto Sans SC', sans-serif;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-secondary);
+            color: var(--text-color);
+            background-color: var(--light-gray);
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .nav-title {
+            font-family: var(--font-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .nav-days {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .day-tab {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .day-tab.active {
+            background: white;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        /* 主内容区 */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            position: relative;
+        }
+        
+        /* 日程内容 */
+        .day-content {
+            display: none;
+        }
+        
+        .day-content.active {
+            display: block;
+        }
+        
+        /* 顶部封面图 */
+        .cover-image {
+            width: 100%;
+            height: 30vh;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .cover-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            padding: 20px 16px;
+            color: white;
+        }
+        
+        .cover-title {
+            font-family: var(--font-primary);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        
+        .cover-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        /* 地图容器 */
+        .map-container {
+            width: 100%;
+            height: 40vh;
+            position: relative;
+        }
+        
+        .map {
+            width: 100%;
+            height: 100%;
+            background-color: #e8e8e8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #888;
+        }
+        
+        /* 行程内容区 */
+        .itinerary-section {
+            padding: 16px;
+            background: white;
+        }
+        
+        .section-title {
+            font-family: var(--font-primary);
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .section-title i {
+            margin-right: 8px;
+        }
+        
+        /* 时间线 */
+        .timeline {
+            position: relative;
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 8px;
+            width: 2px;
+            background-color: #ddd;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            border: 3px solid white;
+            z-index: 1;
+        }
+        
+        .timeline-time {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 6px;
+        }
+        
+        .timeline-card {
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .spot-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .spot-name a {
+            color: inherit;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .nav-button i {
+            margin-right: 4px;
+        }
+        
+        .spot-desc {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+        
+        .spot-tips {
+            font-size: 0.85rem;
+            background-color: rgba(248, 213, 104, 0.2);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-color);
+        }
+        
+        .spot-image {
+            width: 100%;
+            height: 150px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin: 10px 0;
+        }
+        
+        /* 底部区域 */
+        .info-section {
+            background-color: white;
+            padding: 16px;
+            margin-top: 12px;
+        }
+        
+        .tip-list {
+            list-style-type: none;
+        }
+        
+        .tip-list li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .tip-list li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .tip-list li i {
+            position: absolute;
+            left: 0;
+            top: 5px;
+            color: var(--primary-color);
+        }
+        
+        /* 页面指示器 */
+        .page-indicator {
+            display: flex;
+            justify-content: center;
+            padding: 16px;
+            gap: 6px;
+        }
+        
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ddd;
+        }
+        
+        .indicator-dot.active {
+            background-color: var(--primary-color);
+            width: 20px;
+            border-radius: 4px;
+        }
+        
+        /* 页面滑动导航 */
+        .swipe-guide {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .swipe-guide i {
+            margin-right: 6px;
+        }
+        
+        /* 媒体查询 */
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 480px;
+                border-radius: 12px;
+                box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+                margin: 20px auto;
+                height: calc(100vh - 40px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="top-nav">
+            <div class="nav-title">重庆三日游</div>
+            <div class="nav-days">
+                <button class="day-tab active" data-day="1">Day 1</button>
+                <button class="day-tab" data-day="2">Day 2</button>
+                <button class="day-tab" data-day="3">Day 3</button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- 第一天行程 -->
+            <div class="day-content active" id="day1">
+                <div class="cover-image" style="background-image: url('https://images.pexels.com/photos/2846034/pexels-photo-2846034.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')">
+                    <div class="cover-overlay">
+                        <div class="cover-title">解放碑 & 洪崖洞</div>
+                        <div class="cover-subtitle">重庆经典魅力 · Day 1</div>
+                    </div>
+                </div>
+                
+                <div class="map-container">
+                    <div class="map">
+                        <p><i class="fas fa-map-marked-alt"></i> 地图加载中...</p>
+                    </div>
+                </div>
+                
+                <div class="itinerary-section">
+                    <div class="section-title">
+                        <i class="fas fa-route"></i> 今日行程
+                    </div>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">上午 8:30 - 11:30</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-building"></i> 解放碑商圈
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('解放碑', 29.557996, 106.577053)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <img src="https://images.pexels.com/photos/2846034/pexels-photo-2846034.jpeg?auto=compress&cs=tinysrgb&w=600&h=300" alt="解放碑" class="spot-image">
+                                <div class="spot-desc">
+                                    抵达重庆，办理酒店入住。漫步解放碑商圈，感受国际范都市气息，参观重庆大剧院、人民解放纪念碑和八一路步行街，体验山城独特的城市建筑风格。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：解放碑周边有众多美食店铺，可先放下行李后轻装游览。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">中午 12:00 - 13:30</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-utensils"></i> 得劲儿烧菜（解放碑店）
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('得劲儿烧菜', 29.556984, 106.574542)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <div class="spot-desc">
+                                    在解放碑附近品尝地道重庆美食，推荐尝试"得劲儿烧菜"的特色菜，如毛血旺、辣子鸡、酸菜鱼等，感受重庆地道味道。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：推荐菜品：水煮牛肉、江湖菜、泡椒牛蛙。人均消费约80元。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">下午 14:00 - 16:30</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-water"></i> 朝天门广场
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('朝天门广场', 29.567448, 106.582441)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <img src="https://images.pexels.com/photos/2419376/pexels-photo-2419376.jpeg?auto=compress&cs=tinysrgb&w=600&h=300" alt="朝天门" class="spot-image">
+                                <div class="spot-desc">
+                                    前往朝天门广场，这里是长江和嘉陵江的交汇处，是欣赏两江交汇的绝佳位置。可以漫步江边，感受山城江景的壮阔，拍摄两江交汇的风景。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：站在朝天门广场可同时看到长江大桥、千厮门大桥和渝中半岛全景。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">傍晚 17:00 - 18:30</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-mountain"></i> 洪崖洞
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('洪崖洞', 29.565207, 106.575064)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <img src="https://images.pexels.com/photos/2193268/pexels-photo-2193268.jpeg?auto=compress&cs=tinysrgb&w=600&h=300" alt="洪崖洞" class="spot-image">
+                                <div class="spot-desc">
+                                    黄昏时分抵达洪崖洞景区，这里是重庆最具代表性的景点之一。可先参观洪崖洞的吊脚楼建筑群，感受巴渝传统建筑特色，体验"立体的重庆"。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：洪崖洞内有11层，可从顶层慢慢往下逛，欣赏不同角度的风景。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">晚上 19:00 - 21:30</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-moon"></i> 洪崖洞夜景 & 晚餐
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('洪崖洞', 29.565207, 106.575064)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <img src="https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg?auto=compress&cs=tinysrgb&w=600&h=300" alt="洪崖洞夜景" class="spot-image">
+                                <div class="spot-desc">
+                                    欣赏洪崖洞夜景，灯光亮起后的洪崖洞犹如"山城夜明珠"，璀璨夺目。可在洪崖洞九街品尝正宗重庆火锅，感受地道麻辣风味。晚餐后可沿着长江边漫步，欣赏重庆夜景。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：推荐"德庄火锅"或"秦妈火锅"，可点鸳鸯锅底，既能体验重庆辣味又不会太过辛辣。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="section-title">
+                        <i class="fas fa-info-circle"></i> 今日贴士
+                    </div>
+                    <ul class="tip-list">
+                        <li><i class="fas fa-subway"></i> 交通：解放碑区域可乘坐轨道交通1号线或6号线到达临江门站或小什字站，洪崖洞距离解放碑步行约10分钟。</li>
+                        <li><i class="fas fa-hotel"></i> 住宿：推荐入住解放碑或洪崖洞附近酒店，交通便利，夜景优美。</li>
+                        <li><i class="fas fa-coins"></i> 消费：解放碑地区消费水平偏高，洪崖洞区域价格适中，建议提前做预算。</li>
+                        <li><i class="fas fa-walking"></i> 穿着：重庆地形崎岖，建议穿舒适防滑的鞋子，准备雨具以防突然下雨。</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 第二天行程 -->
+            <div class="day-content" id="day2">
+                <div class="cover-image" style="background-image: url('https://images.pexels.com/photos/1658967/pexels-photo-1658967.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')">
+                    <div class="cover-overlay">
+                        <div class="cover-title">磁器口 & 长江索道</div>
+                        <div class="cover-subtitle">古今交融 · Day 2</div>
+                    </div>
+                </div>
+                
+                <div class="map-container">
+                    <div class="map">
+                        <p><i class="fas fa-map-marked-alt"></i> 地图加载中...</p>
+                    </div>
+                </div>
+                
+                <div class="itinerary-section">
+                    <div class="section-title">
+                        <i class="fas fa-route"></i> 今日行程
+                    </div>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">上午 9:00 - 12:00</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-archway"></i> 磁器口古镇
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('磁器口古镇', 29.574061, 106.441103)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <img src="https://images.pexels.com/photos/1658967/pexels-photo-1658967.jpeg?auto=compress&cs=tinysrgb&w=600&h=300" alt="磁器口古镇" class="spot-image">
+                                <div class="spot-desc">
+                                    前往有"小重庆"之称的磁器口古镇，这里保存着完整的明清风貌。漫步石板路，欣赏古朴的吊脚楼，感受巴渝文化的魅力。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：可以尝试当地特色小吃，如陈麻花、毛血旺、鸡杂等，体验地道的重庆味道。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">中午 12:30 - 14:00</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-utensils"></i> 陈昌银麻花
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('陈昌银麻花', 29.574839, 106.442076)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <div class="spot-desc">
+                                    在磁器口品尝地道的重庆小吃，推荐尝试"陈昌银麻花"和"磁器口陈麻花"，这是磁器口最有名的特产之一。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：除了麻花，还可以尝试毛血旺、陈抄手等特色小吃。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">下午 14:30 - 16:30</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-mountain"></i> 南山一棵树观景台
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('南山一棵树观景台', 29.522886, 106.564774)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <img src="https://images.pexels.com/photos/2869215/pexels-photo-2869215.jpeg?auto=compress&cs=tinysrgb&w=600&h=300" alt="南山一棵树" class="spot-image">
+                                <div class="spot-desc">
+                                    前往南山一棵树观景台，这里是俯瞰重庆全景的绝佳位置。可以看到长江、嘉陵江和整个渝中半岛的壮丽景色。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：傍晚时分是观赏重庆夜景的最佳时间，可以看到城市灯光逐渐亮起的过程。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">傍晚 17:00 - 18:30</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-cable-car"></i> 长江索道
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('长江索道', 29.561698, 106.571717)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <img src="https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=600&h=300" alt="长江索道" class="spot-image">
+                                <div class="spot-desc">
+                                    体验被誉为"万里长江第一条空中走廊"的长江索道，横跨长江，连接渝中区和南岸区，是重庆独特的交通工具，也是欣赏长江风光的绝佳方式。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：索道单程票价20元，建议从新华路站乘坐到上新街站，可以看到更美的风景。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">晚上 19:00 - 21:00</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-utensils"></i> 解放碑美食街
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('八一路好吃街', 29.557235, 106.573709)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <img src="https://images.pexels.com/photos/2347383/pexels-photo-2347383.jpeg?auto=compress&cs=tinysrgb&w=600&h=300" alt="解放碑美食街" class="spot-image">
+                                <div class="spot-desc">
+                                    返回解放碑区域，在八一路美食街或解放碑周边品尝重庆特色美食，如重庆小面、酸辣粉、江湖菜等。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：推荐尝试"马旺子"的江湖菜或"陈家坪"的毛血旺，体验正宗重庆味道。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="section-title">
+                        <i class="fas fa-info-circle"></i> 今日贴士
+                    </div>
+                    <ul class="tip-list">
+                        <li><i class="fas fa-subway"></i> 交通：前往磁器口可乘坐轨道交通1号线到达磁器口站；长江索道位于渝中区新华路，可乘坐公交或出租车到达。</li>
+                        <li><i class="fas fa-camera"></i> 摄影：南山和长江索道是拍摄重庆全景的绝佳地点，建议携带相机。</li>
+                        <li><i class="fas fa-ticket-alt"></i> 门票：长江索道单程票价20元，南山一棵树观景台门票约60元。</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 第三天行程 -->
+            <div class="day-content" id="day3">
+                <div class="cover-image" style="background-image: url('https://images.pexels.com/photos/2869215/pexels-photo-2869215.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')">
+                    <div class="cover-overlay">
+                        <div class="cover-title">武隆 & 仙女山</div>
+                        <div class="cover-subtitle">自然奇观 · Day 3</div>
+                    </div>
+                </div>
+                
+                <div class="map-container">
+                    <div id="map3" class="map">
+                        <p><i class="fas fa-map-marked-alt"></i> 地图加载中...</p>
+                    </div>
+                </div>
+                
+                <div class="itinerary-section">
+                    <div class="section-title">
+                        <i class="fas fa-route"></i> 今日行程
+                    </div>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">上午 8:00 - 12:00</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-mountain"></i> 武隆天生三桥
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('武隆天生三桥', 29.327335, 107.756271)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <img src="https://images.pexels.com/photos/2869215/pexels-photo-2869215.jpeg?auto=compress&cs=tinysrgb&w=600&h=300" alt="武隆天生三桥" class="spot-image">
+                                <div class="spot-desc">
+                                    前往武隆天生三桥景区，这里是《变形金刚4》的取景地，壮观的天然石桥群是世界级的自然奇观。游览天龙桥、青龙桥和黑龙桥三座巨大的天然石拱桥，感受大自然的鬼斧神工。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：景区面积较大，建议穿舒适的鞋子，准备足够的水和零食。游览路线有上下坡，体力消耗较大。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">中午 12:30 - 14:00</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-utensils"></i> 武隆特色农家乐
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('武隆特色农家乐', 29.330000, 107.760000)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <div class="spot-desc">
+                                    在武隆当地的农家乐享用午餐，品尝当地特色菜肴，如武隆豆干、土家腊肉、农家土鸡等，补充体力为下午的行程做准备。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：推荐尝试武隆豆干和当地的野菜，价格实惠且风味独特。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">下午 14:30 - 17:30</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-mountain"></i> 仙女山国家森林公园
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('仙女山国家森林公园', 29.457045, 107.741861)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <img src="https://images.pexels.com/photos/1761279/pexels-photo-1761279.jpeg?auto=compress&cs=tinysrgb&w=600&h=300" alt="仙女山" class="spot-image">
+                                <div class="spot-desc">
+                                    前往仙女山国家森林公园，这里是重庆的"天然氧吧"，海拔1900米，四季风景各异。漫步草原，呼吸新鲜空气，欣赏高山草甸的壮丽景色。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：仙女山气温较低，即使夏季也需准备外套。可以选择骑马、滑草等活动，体验高山草原的乐趣。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">晚上 18:00 - 20:00</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-utensils"></i> 仙女山特色烤全羊
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('仙女山特色烤全羊', 29.450000, 107.742000)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <img src="https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=600&h=300" alt="烤全羊" class="spot-image">
+                                <div class="spot-desc">
+                                    在仙女山品尝特色烤全羊，这是当地的传统美食，肉质鲜嫩，风味独特。晚餐后可以欣赏仙女山的星空，远离城市光污染，这里的夜空格外璀璨。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：烤全羊需提前预订，建议4-6人拼餐，人均消费约100元。夜晚温度较低，记得带上保暖衣物。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">晚上 20:30 - 22:00</div>
+                            <div class="timeline-card">
+                                <div class="spot-name">
+                                    <a href="javascript:void(0)">
+                                        <i class="fas fa-moon"></i> 返回市区
+                                    </a>
+                                    <button class="nav-button" onclick="navigate('重庆市区', 29.560, 106.575)">
+                                        <i class="fas fa-map-marker-alt"></i> 导航
+                                    </button>
+                                </div>
+                                <div class="spot-desc">
+                                    结束三日游行程，返回重庆市区。可以选择在仙女山住宿一晚，第二天再返回，也可以当晚返回市区，根据个人行程安排。
+                                </div>
+                                <div class="spot-tips">
+                                    <i class="fas fa-lightbulb"></i> 小贴士：从仙女山返回市区约需2.5小时车程，建议提前安排交通，或选择包车返回更为便捷。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="section-title">
+                        <i class="fas fa-info-circle"></i> 今日贴士
+                    </div>
+                    <ul class="tip-list">
+                        <li><i class="fas fa-bus"></i> 交通：前往武隆需要乘坐长途汽车，从重庆菜园坝汽车站出发，约2小时车程，建议提前购票。</li>
+                        <li><i class="fas fa-tshirt"></i> 着装：仙女山海拔较高，即使夏天也较凉爽，建议携带外套。徒步需穿舒适防滑的鞋子。</li>
+                        <li><i class="fas fa-ticket-alt"></i> 门票：天生三桥门票约140元，仙女山门票约60元，可购买联票更划算。</li>
+                        <li><i class="fas fa-camera"></i> 摄影：武隆和仙女山风景优美，建议携带相机，记录美丽景色。</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="page-indicator">
+                <div class="indicator-dot active" data-day="1"></div>
+                <div class="indicator-dot" data-day="2"></div>
+                <div class="indicator-dot" data-day="3"></div>
+            </div>
+        </div><div class="swipe-guide">
+            <i class="fas fa-arrow-right"></i> 左右滑动切换日程
+        </div>
+    </div>
+    
+    <!-- 使用可靠的地图API替代 -->
+    <script type="text/javascript">
+      window._AMapSecurityConfig = {
+        securityJsCode: 'e75184dd541c0a1d10f8879610f4b49d',  // 替换为你的安全密钥
+      }
+    </script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=e75184dd541c0a1d10f8879610f4b49d&plugin=AMap.Scale,AMap.ToolBar,AMap.Driving,AMap.Walking"></script>
+    <script>
+    // 日期切换功能
+    document.addEventListener('DOMContentLoaded', function() {
+        // 获取所有日期标签和内容
+        const dayTabs = document.querySelectorAll('.day-tab');
+        const dayContents = document.querySelectorAll('.day-content');
+        const indicatorDots = document.querySelectorAll('.indicator-dot');
+        
+        // 为每个日期标签添加点击事件
+        dayTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const day = this.getAttribute('data-day');
+                
+                // 移除所有活动状态
+                dayTabs.forEach(t => t.classList.remove('active'));
+                dayContents.forEach(c => c.classList.remove('active'));
+                indicatorDots.forEach(d => d.classList.remove('active'));
+                
+                // 设置当前日期为活动状态
+                this.classList.add('active');
+                document.getElementById('day' + day).classList.add('active');
+                document.querySelector(`.indicator-dot[data-day="${day}"]`).classList.add('active');
+                
+                // 当切换到不同的日期时，重新初始化地图
+                initMapForDay(day);
+            });
+        });
+        
+        // 指示器点击事件
+        indicatorDots.forEach(dot => {
+            dot.addEventListener('click', function() {
+                const day = this.getAttribute('data-day');
+                document.querySelector(`.day-tab[data-day="${day}"]`).click();
+            });
+        });
+        
+        // 添加触摸滑动功能
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.querySelector('.content').addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        document.querySelector('.content').addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            const threshold = 100; // 滑动阈值
+            
+            if (touchEndX < touchStartX - threshold) {
+                // 向左滑动，切换到下一天
+                const activeTab = document.querySelector('.day-tab.active');
+                const nextTab = activeTab.nextElementSibling;
+                if (nextTab) nextTab.click();
+            }
+            
+            if (touchEndX > touchStartX + threshold) {
+                // 向右滑动，切换到前一天
+                const activeTab = document.querySelector('.day-tab.active');
+                const prevTab = activeTab.previousElementSibling;
+                if (prevTab) prevTab.click();
+            }
+        }
+        
+        // 为所有导航按钮添加点击事件
+        setupNavigationButtons();
+        
+        // 初始化活动日期对应的地图
+        const activeDay = document.querySelector('.day-tab.active').getAttribute('data-day');
+        initMapForDay(activeDay);
+        
+        // 在页面加载完成后0.5秒后再次初始化地图，确保DOM完全准备好
+        setTimeout(() => {
+            initMapForDay(activeDay);
+        }, 500);
+    });
+    
+    // 定义景点数据
+    const spotsDay1 = [
+        { name: '解放碑', position: [106.577053, 29.557996], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png' },
+        { name: '得劲儿烧菜', position: [106.574542, 29.556984], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-food.png' },
+        { name: '朝天门广场', position: [106.582441, 29.567448], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-scenic.png' },
+        { name: '洪崖洞', position: [106.575064, 29.565207], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-scenic.png' }
+    ];
+    
+    const spotsDay2 = [
+        { name: '磁器口古镇', position: [106.441103, 29.574061], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-scenic.png' },
+        { name: '陈昌银麻花', position: [106.442076, 29.574839], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-food.png' },
+        { name: '南山一棵树观景台', position: [106.564774, 29.522886], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-scenic.png' },
+        { name: '长江索道', position: [106.571717, 29.561698], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png' },
+        { name: '解放碑美食街', position: [106.573709, 29.557235], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-food.png' }
+    ];
+    
+    const spotsDay3 = [
+        { name: '武隆天生三桥', position: [107.756271, 29.327335], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-scenic.png' },
+        { name: '武隆特色农家乐', position: [107.760000, 29.330000], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-food.png' },
+        { name: '仙女山国家森林公园', position: [107.741861, 29.457045], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-scenic.png' },
+        { name: '仙女山特色烤全羊', position: [107.742000, 29.450000], icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-food.png' }
+    ];
+    
+    // 根据日期初始化地图
+    function initMapForDay(day) {
+        let spots, center, zoom;
+        
+        switch(day) {
+            case '1':
+                spots = spotsDay1;
+                center = [106.575, 29.560];
+                zoom = 14;
+                break;
+            case '2':
+                spots = spotsDay2;
+                center = [106.520, 29.560];
+                zoom = 12;
+                break;
+            case '3':
+                spots = spotsDay3;
+                center = [107.750, 29.350];
+                zoom = 10;
+                break;
+            default:
+                spots = spotsDay1;
+                center = [106.575, 29.560];
+                zoom = 14;
+        }
+        
+        try {
+            // 确定要使用的地图容器
+            let mapContainers = [];
+            if (day === '1') {
+                const container = document.querySelector('#day1 .map');
+                if (container) mapContainers.push({ container, spots, center, zoom });
+            } else if (day === '2') {
+                // Day 2 has multiple map containers
+                let container1 = document.querySelector('#day2 .map');
+                if (container1) mapContainers.push({ container: container1, spots: spotsDay2.slice(0, 2), center: [106.441, 29.574], zoom: 15 });
+                
+                let container2 = document.querySelector('#day2 #map2');
+                if (container2) mapContainers.push({ container: container2, spots: [spotsDay2[2]], center: [106.564, 29.522], zoom: 15 });
+                
+                let container3 = document.querySelector('#day2 #map3');
+                if (container3) mapContainers.push({ container: container3, spots: spotsDay2.slice(3), center: [106.572, 29.559], zoom: 15 });
+            } else if (day === '3') {
+                const container = document.querySelector('#day3 .map');
+                if (container) mapContainers.push({ container, spots, center, zoom });
+            }
+            
+            // 创建每个地图
+            mapContainers.forEach(mapConfig => {
+                // 清空地图容器
+                mapConfig.container.innerHTML = '';
+                
+                // 创建地图实例
+                try {
+                    const map = new AMap.Map(mapConfig.container, {
+                        viewMode: '3D',
+                        zoom: mapConfig.zoom,
+                        center: mapConfig.center,
+                        pitch: 45,
+                        mapStyle: 'amap://styles/fresh'
+                    });
+                    
+                    // 添加控件
+                    map.addControl(new AMap.Scale());
+                    map.addControl(new AMap.ToolBar());
+                    
+                    // 添加标记点
+                    mapConfig.spots.forEach(spot => {
+                        // 创建标记
+                        const marker = new AMap.Marker({
+                            position: spot.position,
+                            title: spot.name,
+                            icon: spot.icon,
+                            animation: 'AMAP_ANIMATION_DROP'
+                        });
+                        
+                        // 创建信息窗口
+                        const infoWindow = new AMap.InfoWindow({
+                            content: `<div style="padding:10px;">
+                                      <h3 style="margin:0;">${spot.name}</h3>
+                                      <button onclick="navigate('${spot.name}', ${spot.position[1]}, ${spot.position[0]})" 
+                                              style="background:#e62129; color:white; border:none; padding:5px 10px; 
+                                              margin-top:5px; border-radius:4px; cursor:pointer;">
+                                        导航到这里
+                                      </button>
+                                      </div>`,
+                            offset: new AMap.Pixel(0, -30)
+                        });
+                        
+                        // 点击标记时打开信息窗口
+                        marker.on('click', () => {
+                            infoWindow.open(map, marker.getPosition());
+                        });
+                        
+                        // 将标记添加到地图
+                        map.add(marker);
+                    });
+                    
+                    // 仅在地图有多个景点时添加路线规划
+                    if (mapConfig.spots.length > 1) {
+                        // 提取所有景点坐标作为路线点
+                        const waypoints = mapConfig.spots.map(spot => spot.position);
+                        
+                        // 创建驾车路线规划
+                        const driving = new AMap.Driving({
+                            map: map,
+                            hideMarkers: true,
+                            showTraffic: false,
+                            autoFitView: false
+                        });
+                        
+                        // 规划路线
+                        driving.search(
+                            waypoints[0],
+                            waypoints[waypoints.length - 1],
+                            {
+                                waypoints: waypoints.slice(1, -1)
+                            },
+                            function(status, result) {
+                                if (status === 'complete') {
+                                    console.log('规划路线成功');
+                                } else {
+                                    console.error('规划路线失败:', result);
+                                    
+                                    // 使用MCP API尝试获取路线规划
+                                    try {
+                                        const origin = `${waypoints[0][0]},${waypoints[0][1]}`;
+                                        const destination = `${waypoints[waypoints.length-1][0]},${waypoints[waypoints.length-1][1]}`;
+                                        
+                                        mcp_amap_maps_maps_direction_driving({
+                                            origin: origin,
+                                            destination: destination
+                                        }).then(result => {
+                                            console.log("MCP 路线规划成功", result);
+                                        }).catch(err => {
+                                            console.error("MCP 路线规划失败", err);
+                                        });
+                                    } catch (e) {
+                                        console.error("尝试使用MCP API失败", e);
+                                    }
+                                }
+                            }
+                        );
+                    }
+                } catch (e) {
+                    console.error('初始化地图失败:', e);
+                    
+                    // 如果地图初始化失败，使用静态地图作为备选
+                    mapConfig.container.innerHTML = `
+                        <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%;color:#666;text-align:center;padding:20px;">
+                            <i class="fas fa-map-marked-alt" style="font-size:2rem;margin-bottom:10px;"></i>
+                            <p>正在加载地图...</p>
+                            <p style="font-size:0.8rem;margin-top:5px;">如果地图无法显示，请刷新页面重试</p>
+                        </div>
+                    `;
+                    
+                    // 尝试使用MCP API获取地理编码
+                    try {
+                        if (mapConfig.spots.length > 0) {
+                            const firstSpot = mapConfig.spots[0];
+                            mcp_amap_maps_maps_regeocode({
+                                location: `${firstSpot.position[0]},${firstSpot.position[1]}`
+                            }).then(result => {
+                                console.log("地理编码成功", result);
+                                mapConfig.container.innerHTML = `
+                                    <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%;color:#666;text-align:center;padding:20px;">
+                                        <i class="fas fa-map-marked-alt" style="font-size:2rem;margin-bottom:10px;"></i>
+                                        <p>${result.regeocode?.formatted_address || '位置信息获取成功'}</p>
+                                        <button onclick="navigate('${firstSpot.name}', ${firstSpot.position[1]}, ${firstSpot.position[0]})" 
+                                                style="background:#e62129; color:white; border:none; padding:5px 10px; 
+                                                margin-top:15px; border-radius:4px; cursor:pointer;">
+                                            导航到${firstSpot.name}
+                                        </button>
+                                    </div>
+                                `;
+                            }).catch(err => {
+                                console.error("地理编码失败", err);
+                            });
+                        }
+                    } catch (e) {
+                        console.error("尝试使用MCP API失败", e);
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('地图初始化过程中发生错误:', error);
+        }
+    }
+    
+    // 为所有导航按钮添加点击事件
+    function setupNavigationButtons() {
+        // 查找所有导航按钮
+        const navButtons = document.querySelectorAll('.nav-button');
+        
+        navButtons.forEach(button => {
+            // 获取按钮的父元素中的景点名称
+            const spotNameElement = button.parentElement.querySelector('a');
+            if (spotNameElement) {
+                const spotName = spotNameElement.textContent.trim().replace(/\s+/g, ' ');
+                
+                // 根据景点名称查找对应的坐标
+                let spotInfo = null;
+                
+                for (const spot of [...spotsDay1, ...spotsDay2, ...spotsDay3]) {
+                    if (spot.name === spotName || spotName.includes(spot.name)) {
+                        spotInfo = spot;
+                        break;
+                    }
+                }
+                
+                if (spotInfo) {
+                    // 添加点击事件
+                    button.onclick = function() {
+                        navigate(spotInfo.name, spotInfo.position[1], spotInfo.position[0]);
+                    };
+                }
+                
+                // 针对特殊景点手动添加坐标
+                if (spotName.includes('洪崖洞夜景')) {
+                    button.onclick = function() {
+                        navigate('洪崖洞', 29.565207, 106.575064);
+                    };
+                } else if (spotName.includes('返回市区')) {
+                    button.onclick = function() {
+                        navigate('重庆市区', 29.560, 106.575);
+                    };
+                }
+            }
+        });
+    }
+    
+    // 导航功能
+    function navigate(name, lat, lng) {
+        // 检测设备类型
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        
+        try {
+            if (isAndroid) {
+                // Android设备 - 直接打开高德地图App
+                window.location.href = `androidamap://navi?sourceApplication=重庆三日游&poiname=${encodeURIComponent(name)}&lat=${lat}&lon=${lng}&dev=0&style=2`;
+                
+                // 如果没有安装高德地图App，3秒后尝试打开网页版
+                setTimeout(() => {
+                    window.location.href = `https://uri.amap.com/navigation?to=${lng},${lat},${encodeURIComponent(name)}&mode=car&src=mypage&coordinate=gaode`;
+                }, 3000);
+            } else if (isIOS) {
+                // iOS设备 - 直接打开高德地图App
+                window.location.href = `iosamap://navi?sourceApplication=重庆三日游&poiname=${encodeURIComponent(name)}&lat=${lat}&lon=${lng}&dev=0&style=2`;
+                
+                // 如果没有安装高德地图App，3秒后尝试打开网页版
+                setTimeout(() => {
+                    window.location.href = `https://uri.amap.com/navigation?to=${lng},${lat},${encodeURIComponent(name)}&mode=car&src=mypage&coordinate=gaode`;
+                }, 3000);
+            } else {
+                // 其他设备使用网页版
+                window.open(`https://uri.amap.com/navigation?to=${lng},${lat},${encodeURIComponent(name)}&mode=car&src=mypage&coordinate=gaode`, '_blank');
+                
+                // 使用MCP API获取导航路线信息作为备选
+                try {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const origin = `${position.coords.longitude},${position.coords.latitude}`;
+                            const destination = `${lng},${lat}`;
+                            
+                            mcp_amap_maps_maps_direction_driving({
+                                origin: origin,
+                                destination: destination
+                            }).then(result => {
+                                console.log("获取导航路线成功", result);
+                                // 如果高德地图没有打开，可以在页面上显示导航信息
+                                if (result && result.route && result.route.paths && result.route.paths.length > 0) {
+                                    const path = result.route.paths[0];
+                                    alert(`从当前位置到${name}，距离约${(path.distance/1000).toFixed(1)}公里，预计耗时${Math.ceil(path.duration/60)}分钟`);
+                                }
+                            }).catch(err => {
+                                console.error("获取导航路线失败", err);
+                            });
+                        },
+                        (error) => {
+                            console.error("无法获取位置:", error);
+                        }
+                    );
+                } catch (e) {
+                    console.error("尝试使用MCP API失败", e);
+                }
+            }
+        } catch (e) {
+            console.error("导航过程中发生错误:", e);
+            // 如果有错误，回退到网页版
+            window.open(`https://uri.amap.com/navigation?to=${lng},${lat},${encodeURIComponent(name)}&mode=car&src=mypage&coordinate=gaode`, '_blank');
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="厦门波普艺术之旅：鼓浪屿、南普陀寺、集美学村等景点详细介绍，含语音导览、特色景点详情和行程规划">
+    <title>厦门波普艺术之旅 - 景点详情指南</title>
+    <link href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Luckiest+Guy&display=swap');
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f0f0f0; /* Light gray background for contrast */
+        }
+
+        .pop-container {
+            max-width: 480px; /* Simulate mobile screen */
+            margin: 1rem auto;
+            border: 4px solid black;
+            background-color: #ffffff; /* White base */
+            overflow: hidden;
+        }
+
+        .pop-header {
+            background-color: #ffde00; /* Bright Yellow */
+            color: black;
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 4px solid black;
+            position: relative;
+        }
+
+        .pop-header h1 {
+            font-family: 'Bangers', cursive;
+            font-size: 3.5rem;
+            line-height: 1;
+            text-shadow: 3px 3px 0 #ffffff; /* White shadow for pop */
+            margin-bottom: 0.5rem;
+        }
+
+        .pop-header p {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .pop-section {
+            padding: 1.5rem;
+            border-bottom: 4px solid black;
+            position: relative;
+        }
+
+        .pop-section h2 {
+            font-family: 'Bangers', cursive;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background-color: #ff3b30; /* Bright Red */
+            color: white;
+            transform: rotate(-3deg); /* Slightly tilted */
+            box-shadow: 4px 4px 0 black;
+        }
+
+        .pop-section.blue-bg { background-color: #007aff; color: white; } /* Bright Blue */
+        .pop-section.yellow-bg { background-color: #ffde00; color: black; } /* Bright Yellow */
+        .pop-section.red-bg { background-color: #ff3b30; color: white; } /* Bright Red */
+
+
+        .pop-list li {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .pop-list li::before {
+            content: "★"; /* Star icon */
+            position: absolute;
+            left: 0;
+            color: #ff3b30; /* Red star */
+            font-size: 1.2rem;
+        }
+
+        .pop-table th, .pop-table td {
+            border: 2px solid black;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        .pop-table th {
+            background-color: #007aff; /* Blue header */
+            color: white;
+            font-family: 'Luckiest Guy', cursive;
+        }
+
+        .halftone-bg {
+             background-image: radial-gradient(circle, black 2px, transparent 2px);
+             background-size: 10px 10px;
+             background-color: white; /* Ensure background color is set */
+             position: absolute;
+             top: 0;
+             left: 0;
+             right: 0;
+             bottom: 0;
+             opacity: 0.1; /* Adjust opacity */
+             z-index: 0;
+             pointer-events: none; /* Allow interaction with content */
+        }
+
+        .content-overlay {
+            position: relative;
+            z-index: 1;
+        }
+
+
+        .speech-bubble {
+            position: relative;
+            background: #007aff; /* Blue background */
+            border-radius: .4em;
+            padding: 1em;
+            color: white;
+            border: 4px solid black;
+            font-family: 'Comic Sans MS', cursive, sans-serif; /* Comic style font */
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border: 20px solid transparent;
+            border-top-color: #007aff; /* Match background */
+            border-bottom: 0;
+            border-left: 0;
+            margin-left: -10px;
+            margin-bottom: -24px; /* Overlap the border */
+        }
+
+        .explosion {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: #ffde00; /* Yellow */
+            border: 4px solid black;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Bangers', cursive;
+            font-size: 0.8rem;
+            color: black;
+            transform: rotate(15deg);
+        }
+
+
+        .pop-icon {
+            margin-right: 0.5rem;
+            color: black; /* Ensure icons have black color */
+            font-size: 1.2rem;
+        }
+
+        /* Adjust icon colors within colored backgrounds */
+        .blue-bg .pop-icon, .red-bg .pop-icon { color: white; }
+        .yellow-bg .pop-icon { color: black; }
+
+        .comic-button {
+            display: inline-block;
+            background-color: #ffde00; /* Yellow */
+            color: black;
+            font-family: 'Bangers', cursive;
+            padding: 0.5rem 1rem;
+            border: 4px solid black;
+            box-shadow: 4px 4px 0 black;
+            text-decoration: none;
+            margin-top: 0.5rem;
+            transition: all 0.1s ease;
+        }
+        .comic-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 black;
+        }
+
+        .spot-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .spot-details.active {
+            max-height: 500px;
+            padding: 1rem;
+            border: 2px dashed black;
+        }
+
+        .spot-title {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .spot-title::after {
+            content: '▼';
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .spot-title.active::after {
+            transform: rotate(180deg);
+        }
+
+        .audio-player {
+            margin-top: 0.5rem;
+            width: 100%;
+            height: 40px;
+        }
+
+    </style>
+    <script>
+        function toggleDetails(element) {
+            const details = element.nextElementSibling;
+            const title = element;
+            details.classList.toggle('active');
+            title.classList.toggle('active');
+        }
+
+        function playAudio(audioElement) {
+            // 停止其他正在播放的音频
+            document.querySelectorAll('audio').forEach(audio => {
+                if (audio !== audioElement) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+
+    <div class="pop-container">
+
+        <!-- 1. 行程标题区 -->
+        <div class="pop-header">
+            <div class="explosion" style="top: 1rem; left: 1rem;">WOW!</div>
+             <div class="explosion" style="bottom: 1rem; right: 1rem; background-color: #ff3b30; color: white; transform: rotate(-10deg);">FUN!</div>
+            <h1>厦门 TRIP!</h1>
+            <p>三天两夜波普狂想曲</p>
+            <p>旅行日期: 2024年X月X日 - X月X日</p>
+            <p>天气: 晴朗为主，<i class="fas fa-sun pop-icon"></i> 25-30°C</p>
+        </div>
+
+        <!-- 2. 行程概览区 -->
+        <div class="pop-section yellow-bg">
+             <div class="halftone-bg"></div>
+             <div class="content-overlay">
+                <h2>行程 ZAP!</h2>
+                <ul class="pop-list">
+                    <li><strong>Day 1:</strong> <i class="fas fa-palette pop-icon"></i> 鼓浪屿艺术漫步 & 海滨风情</li>
+                    <li><strong>Day 2:</strong> <i class="fas fa-landmark pop-icon"></i> 南普陀寺祈福 & 环岛路骑行</li>
+                    <li><strong>Day 3:</strong> <i class="fas fa-graduation-cap pop-icon"></i> 集美学村怀旧 & 曾厝垵寻味</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 3. 详细时间表区 -->
+        <div class="pop-section">
+             <div class="halftone-bg"></div>
+             <div class="content-overlay">
+                <h2>时间 POW!</h2>
+                <table class="pop-table w-full">
+                    <thead>
+                        <tr><th>时间</th><th>活动</th><th>备注 (POP!)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Day 1 上午</td><td>抵达厦门，前往轮渡码头，乘船上鼓浪屿</td><td>船票约35元</td></tr>
+                        <tr><td>Day 1 下午</td><td>漫步鼓浪屿：菽庄花园、皓月园、万国建筑</td><td>联票约100元</td></tr>
+                         <tr><td>Day 1 晚上</td><td>龙头路小吃街，品尝特色小吃</td><td>土笋冻、沙茶面!</td></tr>
+                        <tr><td>Day 2 上午</td><td>参观南普陀寺</td><td>免费，虔诚祈福</td></tr>
+                        <tr><td>Day 2 下午</td><td>厦门大学(外观或预约)、环岛路骑行</td><td>感受青春气息</td></tr>
+                        <tr><td>Day 2 晚上</td><td>中山路步行街</td><td>购物美食天堂</td></tr>
+                         <tr><td>Day 3 上午</td><td>前往集美学村，参观鳌园、嘉庚建筑</td><td>感受嘉庚精神</td></tr>
+                         <tr><td>Day 3 下午</td><td>曾厝垵文艺渔村，购买伴手礼</td><td>拍照打卡!</td></tr>
+                         <tr><td>Day 3 晚上</td><td>整理行装，前往机场/火车站返程</td><td>下次再来! BAM!</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 4. 交通信息区 -->
+        <div class="pop-section blue-bg">
+             <div class="halftone-bg"></div>
+             <div class="content-overlay">
+                <h2>交通 ZOOM!</h2>
+                 <p class="mb-4"><i class="fas fa-bus pop-icon"></i> 主要交通方式：公交、BRT、轮渡、出租车/网约车。</p>
+                 <div class="speech-bubble mb-4">
+                     <p><strong>轮渡TIPS!</strong> 去鼓浪屿要在【厦门邮轮中心厦鼓码头】乘船哦，别走错啦！</p>
+                 </div>
+                 <ul class="pop-list">
+                     <li><i class="fas fa-subway pop-icon"></i> 机场/火车站 <i class="fas fa-arrow-right pop-icon"></i> 市区: BRT或出租车</li>
+                     <li><i class="fas fa-ship pop-icon"></i> 市区 <i class="fas fa-arrow-right pop-icon"></i> 鼓浪屿: 轮渡 (约20分钟)</li>
+                     <li><i class="fas fa-bicycle pop-icon"></i> 环岛路: 建议租自行车骑行</li>
+                 </ul>
+             </div>
+        </div>
+
+        <!-- 5. 住宿与餐饮区 -->
+        <div class="pop-section red-bg">
+             <div class="halftone-bg"></div>
+             <div class="content-overlay">
+                 <h2>吃住 YUM!</h2>
+                 <h3 class="font-bold text-xl mb-2 font-['Luckiest_Guy']">住宿 BANG!</h3>
+                 <p class="mb-4"><i class="fas fa-hotel pop-icon"></i> 建议选择思明区靠近轮渡或中山路的酒店，交通便利。如：[酒店名称示例] 地址：[地址示例]</p>
+                 <h3 class="font-bold text-xl mb-2 font-['Luckiest_Guy']">餐饮 WHAM!</h3>
+                 <ul class="pop-list">
+                     <li><i class="fas fa-utensils pop-icon"></i> 沙茶面 (推荐: [店铺名示例])</li>
+                     <li><i class="fas fa-ice-cream pop-icon"></i> 土笋冻 (街边小摊风味佳)</li>
+                     <li><i class="fas fa-fish pop-icon"></i> 海蛎煎 (外酥里嫩!)</li>
+                     <li><i class="fas fa-cookie-bite pop-icon"></i> 姜母鸭 (滋补暖身)</li>
+                     <li><i class="fas fa-leaf pop-icon"></i> 花生汤 (香甜可口)</li>
+                 </ul>
+            </div>
+        </div>
+
+        <!-- 6. 实用信息区 -->
+        <div class="pop-section yellow-bg">
+             <div class="halftone-bg"></div>
+             <div class="content-overlay">
+                 <h2>贴士 KAPOW!</h2>
+                 <ul class="pop-list">
+                     <li><i class="fas fa-phone-alt pop-icon"></i> 紧急电话: 110, 120, 119</li>
+                     <li><i class="fas fa-lightbulb pop-icon"></i> 鼓浪屿船票建议提前网上预订</li>
+                     <li><i class="fas fa-sun pop-icon"></i> 注意防晒！厦门紫外线较强</li>
+                     <li><i class="fas fa-suitcase-rolling pop-icon"></i> 行李精简，备好舒适的鞋子</li>
+                     <li><i class="fas fa-wallet pop-icon"></i> 预算摘要：[示例：交通约200元，门票约300元，住宿约600元，餐饮约400元...]</li>
+                 </ul>
+             </div>
+        </div>
+
+        <!-- 7. 景点推荐 -->
+        <div class="pop-section">
+             <div class="halftone-bg"></div>
+             <div class="content-overlay">
+                <h2>景点 WOWZA!</h2>
+                
+                <!-- 鼓浪屿 -->
+                <div class="mb-4 border-2 border-black p-3 bg-white">
+                    <h4 class="spot-title font-bold text-lg mb-1 font-['Luckiest_Guy']" onclick="toggleDetails(this)">
+                        鼓浪屿 (Gulangyu)
+                    </h4>
+                    <div class="spot-details">
+                        <p class="text-sm mb-2">
+                            鼓浪屿因"涛声如鼓，屿影如浪"而得名，是中国最美丽的海岛之一，被联合国教科文组织列入世界文化遗产名录。
+                            <br><br>
+                            <strong>日光岩</strong>：因巨石上刻有"日光岩"三字而得名，是鼓浪屿制高点。海拔92.7米，登顶可俯瞰全岛风光，也是观赏日落的绝佳位置。相传明朝郑成功曾在此处观察海势，规划收复台湾的战略。
+                            <br><br>
+                            <strong>菽庄花园</strong>：始建于1913年，由闽南富商林尔嘉投资建造。分为藏海园、补山园、种德园和来鹭园四个区域。被誉为"东南沿海最美丽的私人花园"，体现了中西合璧的园林艺术。
+                            <br><br>
+                            <strong>皓月园</strong>：融合了英国哥特式和法国巴洛克风格，见证了近代中外文化交流史。园内收藏了大量珍贵的钢琴，被誉为"钢琴博物馆"。
+                            <br><br>
+                            <strong>八卦楼</strong>：中西结合的"番仔楼"，平面呈八卦形。曾是著名华侨黄家的私宅，见证了鼓浪屿的繁华历史。楼高三层，采用希腊式圆柱，融合了中国传统八卦文化。
+                        </p>
+                        <audio class="audio-player" controls onplay="playAudio(this)">
+                            <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250418120326-HqViEiyL.mp3?Expires=86401744949007&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=wI6czTVpEuQezrLn8oiMUE5MWvI%3D" type="audio/mpeg">
+                            您的浏览器不支持音频播放。
+                        </audio>
+                    </div>
+                </div>
+                
+                <!-- 南普陀寺 -->
+                <div class="mb-4 border-2 border-black p-3 bg-yellow-100">
+                    <h4 class="spot-title font-bold text-lg mb-1 font-['Luckiest_Guy']" onclick="toggleDetails(this)">
+                        南普陀寺
+                    </h4>
+                    <div class="spot-details">
+                        <p class="text-sm mb-2">
+                            始建于唐代，明清时期重建，因位于浙江普陀山之南而得名，是闽南佛教重要寺院。
+                            <br><br>
+                            <strong>大雄宝殿</strong>：金碧辉煌，重檐歇山顶。供奉释迦牟尼佛，两侧有十八罗汉。相传乾隆皇帝曾在此礼佛，并赐名"南普陀寺"。
+                            <br><br>
+                            <strong>天王殿</strong>：寺院第一进，供奉四大天王。殿内佛像工艺精湛，体现闽南佛教艺术特色。是佛教护法之神的象征。
+                            <br><br>
+                            <strong>五老峰</strong>：位于寺院后山。相传五位老僧在此修行成道，化为五座山峰。是厦大学子求学问道、祈福许愿的圣地。
+                        </p>
+                        <audio class="audio-player" controls onplay="playAudio(this)">
+                            <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250418120345-JaSmsPbh.mp3?Expires=86401744949025&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=dcY%2Bfp7v1XpUSojYEIUEMLmzBjY%3D" type="audio/mpeg">
+                            您的浏览器不支持音频播放。
+                        </audio>
+                    </div>
+                </div>
+                
+                <!-- 集美学村 -->
+                <div class="mb-4 border-2 border-black p-3 bg-blue-100">
+                    <h4 class="spot-title font-bold text-lg mb-1 font-['Luckiest_Guy']" onclick="toggleDetails(this)">
+                        集美学村
+                    </h4>
+                    <div class="spot-details">
+                        <p class="text-sm mb-2">
+                            由著名爱国华侨陈嘉庚先生创办，是一座具有独特建筑风格的教育城。
+                            <br><br>
+                            <strong>嘉庚建筑群</strong>：融合中西方建筑元素，创造"嘉庚风格"。代表作品有集美学村主楼、图书馆、讲堂等。见证了中国近代教育发展史。
+                            <br><br>
+                            <strong>鳌园</strong>：以"鳌"为主题，融合闽南文化特色。体现了陈嘉庚先生"诚毅"校训的精神。建筑以红砖青瓦为特色，中西合璧。
+                            <br><br>
+                            <strong>陈嘉庚纪念馆</strong>：展览内容包括陈嘉庚生平事迹、办学历程。记录了华侨支持祖国教育事业的感人故事。弘扬嘉庚精神，传承爱国情怀。
+                        </p>
+                        <audio class="audio-player" controls onplay="playAudio(this)">
+                            <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250418120401-HJVICMaa.mp3?Expires=86401744949041&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=9JmJ6pRMEH%2Bn6vcoMYGNECgTErk%3D" type="audio/mpeg">
+                            您的浏览器不支持音频播放。
+                        </audio>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. 美食推荐 -->
+         <div class="pop-section blue-bg">
+              <div class="halftone-bg"></div>
+              <div class="content-overlay">
+                 <h2>美食 BOOM!</h2>
+                 <p class="mb-2"><i class="fas fa-map-marker-alt pop-icon"></i> <strong>中山路</strong>：老字号云集，如黄则和花生汤。</p>
+                 <p class="mb-2"><i class="fas fa-map-marker-alt pop-icon"></i> <strong>龙头路</strong>：鼓浪屿小吃集中地，边走边吃。</p>
+                 <p class="mb-2"><i class="fas fa-map-marker-alt pop-icon"></i> <strong>曾厝垵</strong>：文艺小店多，海鲜排挡选择丰富。</p>
+                 <div class="speech-bubble mt-4">
+                     <p><strong>吃货ALERT!</strong> 一定要试试海鲜大排档，新鲜又美味！价格记得先问清楚哦！</p>
+                 </div>
+             </div>
+        </div>
+
+         <!-- 9. 天气预报 -->
+        <div class="pop-section red-bg">
+            <div class="halftone-bg"></div>
+            <div class="content-overlay">
+                 <h2>天气 ZING!</h2>
+                 <p><i class="fas fa-cloud-sun pop-icon"></i> 未来三天：大致晴朗，午间较热，早晚舒适。</p>
+                 <p><i class="fas fa-temperature-high pop-icon"></i> 平均气温：25°C - 30°C</p>
+                 <p><i class="fas fa-umbrella pop-icon"></i> 降水概率：低，但海边天气多变，建议带伞备用。</p>
+                 <p class="mt-2 font-['Luckiest_Guy']">Have a POPPIN' trip! <i class="fas fa-rocket pop-icon"></i></p>
+             </div>
+        </div>
+
+    </div>
+
+    <!-- 厦门景点详细介绍部分 -->
+    <div class="pop-container mt-8">
+        <div class="pop-header">
+            <div class="explosion" style="top: 1rem; left: 1rem;">HOT!</div>
+            <div class="explosion" style="bottom: 1rem; right: 1rem; background-color: #ff3b30; color: white; transform: rotate(-10deg);">NEW!</div>
+            <h1>景点详情</h1>
+            <p>厦门经典景点全攻略</p>
+        </div>
+
+        <!-- 鼓浪屿详情 -->
+        <div class="pop-section yellow-bg">
+            <div class="halftone-bg"></div>
+            <div class="content-overlay">
+                <h2>鼓浪屿 (Gulangyu)</h2>
+                <p class="mb-3">鼓浪屿因"涛声如鼓，屿影如浪"而得名，是中国最美丽的海岛之一，被联合国教科文组织列入世界文化遗产名录。</p>
+                
+                <div class="bg-white p-3 mb-3 border-2 border-black">
+                    <h3 class="font-bold text-lg mb-1 font-['Luckiest_Guy']">日光岩</h3>
+                    <ul class="pop-list">
+                        <li><strong>历史背景</strong>：因巨石上刻有"日光岩"三字而得名，是鼓浪屿制高点</li>
+                        <li><strong>特色介绍</strong>：海拔92.7米，登顶可俯瞰全岛风光，也是观赏日落的绝佳位置</li>
+                        <li><strong>文化典故</strong>：相传明朝郑成功曾在此处观察海势，规划收复台湾的战略</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-3 mb-3 border-2 border-black">
+                    <h3 class="font-bold text-lg mb-1 font-['Luckiest_Guy']">菽庄花园</h3>
+                    <ul class="pop-list">
+                        <li><strong>历史背景</strong>：始建于1913年，由闽南富商林尔嘉投资建造</li>
+                        <li><strong>园林布局</strong>：分为藏海园、补山园、种德园和来鹭园四个区域</li>
+                        <li><strong>文化价值</strong>：被誉为"东南沿海最美丽的私人花园"，体现了中西合璧的园林艺术</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-3 mb-3 border-2 border-black">
+                    <h3 class="font-bold text-lg mb-1 font-['Luckiest_Guy']">皓月园</h3>
+                    <ul class="pop-list">
+                        <li><strong>建筑特色</strong>：融合了英国哥特式和法国巴洛克风格</li>
+                        <li><strong>历史意义</strong>：见证了近代中外文化交流史</li>
+                        <li><strong>艺术价值</strong>：园内收藏了大量珍贵的钢琴，被誉为"钢琴博物馆"</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-3 mb-3 border-2 border-black">
+                    <h3 class="font-bold text-lg mb-1 font-['Luckiest_Guy']">八卦楼</h3>
+                    <ul class="pop-list">
+                        <li><strong>建筑风格</strong>：中西结合的"番仔楼"，平面呈八卦形</li>
+                        <li><strong>历史故事</strong>：曾是著名华侨黄家的私宅，见证了鼓浪屿的繁华历史</li>
+                        <li><strong>建筑特色</strong>：楼高三层，采用希腊式圆柱，融合了中国传统八卦文化</li>
+                    </ul>
+                </div>
+                <audio class="audio-player w-full mt-2" controls>
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250418120326-HqViEiyL.mp3?Expires=86401744949007&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=wI6czTVpEuQezrLn8oiMUE5MWvI%3D" type="audio/mpeg">
+                    您的浏览器不支持音频播放。
+                </audio>
+            </div>
+        </div>
+
+        <!-- 南普陀寺详情 -->
+        <div class="pop-section blue-bg">
+            <div class="halftone-bg"></div>
+            <div class="content-overlay">
+                <h2>南普陀寺</h2>
+                <p class="mb-3">始建于唐代，明清时期重建，因位于浙江普陀山之南而得名，是闽南佛教重要寺院。</p>
+                
+                <div class="bg-white p-3 mb-3 border-2 border-black text-black">
+                    <h3 class="font-bold text-lg mb-1 font-['Luckiest_Guy']">大雄宝殿</h3>
+                    <ul class="pop-list">
+                        <li><strong>建筑特色</strong>：金碧辉煌，重檐歇山顶</li>
+                        <li><strong>文化内涵</strong>：供奉释迦牟尼佛，两侧有十八罗汉</li>
+                        <li><strong>历史典故</strong>：相传乾隆皇帝曾在此礼佛，并赐名"南普陀寺"</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-3 mb-3 border-2 border-black text-black">
+                    <h3 class="font-bold text-lg mb-1 font-['Luckiest_Guy']">天王殿</h3>
+                    <ul class="pop-list">
+                        <li><strong>建筑布局</strong>：寺院第一进，供奉四大天王</li>
+                        <li><strong>艺术价值</strong>：殿内佛像工艺精湛，体现闽南佛教艺术特色</li>
+                        <li><strong>文化意义</strong>：是佛教护法之神的象征</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-3 mb-3 border-2 border-black text-black">
+                    <h3 class="font-bold text-lg mb-1 font-['Luckiest_Guy']">五老峰</h3>
+                    <ul class="pop-list">
+                        <li><strong>地理位置</strong>：位于寺院后山</li>
+                        <li><strong>文化传说</strong>：相传五位老僧在此修行成道，化为五座山峰</li>
+                        <li><strong>现代意义</strong>：是厦大学子求学问道、祈福许愿的圣地</li>
+                    </ul>
+                </div>
+                <audio class="audio-player w-full mt-2" controls>
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250418120345-JaSmsPbh.mp3?Expires=86401744949025&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=dcY%2Bfp7v1XpUSojYEIUEMLmzBjY%3D" type="audio/mpeg">
+                    您的浏览器不支持音频播放。
+                </audio>
+            </div>
+        </div>
+
+        <!-- 集美学村详情 -->
+        <div class="pop-section red-bg">
+            <div class="halftone-bg"></div>
+            <div class="content-overlay">
+                <h2>集美学村</h2>
+                <p class="mb-3">由著名爱国华侨陈嘉庚先生创办，是一座具有独特建筑风格的教育城。</p>
+                
+                <div class="bg-white p-3 mb-3 border-2 border-black text-black">
+                    <h3 class="font-bold text-lg mb-1 font-['Luckiest_Guy']">嘉庚建筑群</h3>
+                    <ul class="pop-list">
+                        <li><strong>建筑特色</strong>：融合中西方建筑元素，创造"嘉庚风格"</li>
+                        <li><strong>代表作品</strong>：集美学村主楼、图书馆、讲堂等</li>
+                        <li><strong>历史意义</strong>：见证了中国近代教育发展史</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-3 mb-3 border-2 border-black text-black">
+                    <h3 class="font-bold text-lg mb-1 font-['Luckiest_Guy']">鳌园</h3>
+                    <ul class="pop-list">
+                        <li><strong>园林设计</strong>：以"鳌"为主题，融合闽南文化特色</li>
+                        <li><strong>文化内涵</strong>：体现了陈嘉庚先生"诚毅"校训的精神</li>
+                        <li><strong>建筑特色</strong>：红砖青瓦，中西合璧</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-3 mb-3 border-2 border-black text-black">
+                    <h3 class="font-bold text-lg mb-1 font-['Luckiest_Guy']">陈嘉庚纪念馆</h3>
+                    <ul class="pop-list">
+                        <li><strong>展览内容</strong>：陈嘉庚生平事迹、办学历程</li>
+                        <li><strong>历史价值</strong>：记录了华侨支持祖国教育事业的感人故事</li>
+                        <li><strong>教育意义</strong>：弘扬嘉庚精神，传承爱国情怀</li>
+                    </ul>
+                </div>
+                <audio class="audio-player w-full mt-2" controls>
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250418120401-HJVICMaa.mp3?Expires=86401744949041&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=9JmJ6pRMEH%2Bn6vcoMYGNECgTErk%3D" type="audio/mpeg">
+                    您的浏览器不支持音频播放。
+                </audio>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

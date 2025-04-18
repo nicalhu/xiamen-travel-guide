@@ -1,0 +1,46 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.drop-zone {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    margin: 20px 0;
+    cursor: pointer;
+}
+
+.image-container img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 20px;
+}
+
+.status {
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+.table-container {
+    margin: 20px 0;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
